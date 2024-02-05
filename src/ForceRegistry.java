@@ -1,33 +1,22 @@
-import java.util.ArrayList;
-import java.util.Iterator ;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 /**
  * Holds all the force generators and the particles they apply to
  */
 class ForceRegistry {
 
-    /**
-     * Keeps track of one force generator and the particle
-     *  it applies to.
-     */
-    static class ForceRegistration {
-        public final GameObject gameObject;
-        public final ForceGenerator forceGenerator ;
-        ForceRegistration(GameObject p, ForceGenerator fg) {
-            gameObject = p ;
-            forceGenerator = fg ;
-        }
-    }
-
     // Holds the list of registrations
-    LinkedHashMap<Integer, ForceRegistration> registrations = new LinkedHashMap<>() ;
+    LinkedHashMap<GameObject, LinkedList<ForceGenerator>> registrations = new LinkedHashMap<>() ;
 
     /**
      * Register the given force to apply to the given particle
      */
     void add(GameObject gameObject, ForceGenerator fg) {
-        registrations.put(gameObject.getId(), new ForceRegistration(gameObject, fg));
+        if (!registrations.containsKey(gameObject)) {
+            registrations.put(gameObject, new LinkedList<>());
+        }
+        registrations.get(gameObject).add(fg);
     }
 
     /**
@@ -35,7 +24,7 @@ class ForceRegistry {
      * pair is not registered, this method will have no effect.
      */
     public void remove(GameObject gameObject) {
-        registrations.remove(gameObject.getId());
+        registrations.remove(gameObject);
     }
 
     /**
@@ -50,9 +39,10 @@ class ForceRegistry {
      *  corresponding particles.
      */
     void updateForces() {
-        for (Integer id : registrations.keySet()) {
-            ForceRegistration fr = registrations.get(id);
-            fr.forceGenerator.updateForce(fr.gameObject) ;
+        for (GameObject gameObject : registrations.keySet()) {
+            for (ForceGenerator fg : registrations.get(gameObject)) {
+                fg.updateForce(gameObject);
+            }
         }
     }
 }
