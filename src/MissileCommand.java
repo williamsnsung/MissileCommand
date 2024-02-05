@@ -10,12 +10,14 @@ public class MissileCommand extends PApplet{
     final int SCREEN_WIDTH = 500 ;
     final int SCREEN_HEIGHT = 500 ;
     final int BALLISTA_RADII = 25;
+    final int CITY_RADII = 15;
+    final int CITY_SCORE = 100;
     final char BALLISTA0 = 'q';
     final char BALLISTA1 = 'w';
     final char BALLISTA2 = 'e';
     final char TRIGGER = ' ';
     final int MISSILE_RADII = 10;
-    final float MISSILE_VELOCITY = 25;
+    final float MISSILE_VELOCITY = 28;
     final float INVERTED_MISSILE_MASS = 0.5f;
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
@@ -27,7 +29,7 @@ public class MissileCommand extends PApplet{
     Ballista[] ballista;
     Infrastructure[] city;
     int[] meteoriteVelocityRange;
-    LinkedList<Missile> activeMissiles;
+    LinkedHashMap<Integer, Missile> activeMissiles;
     LinkedHashMap<Integer, EnemyMissile> enemies;
     boolean missilesTriggered;
 
@@ -41,14 +43,14 @@ public class MissileCommand extends PApplet{
         float ballistaX = ballista[activeBallista].getPosition().x;
         float ballistaY = ballista[activeBallista].getPosition().y;
         Missile missile = new Missile(ballistaX, ballistaY, velocity.x, velocity.y, INVERTED_MISSILE_MASS);
-        activeMissiles.add(missile);
+        activeMissiles.put(missile.getId(), missile);
         forceRegistry.add(missile, gravity);
         forceRegistry.add(missile, drag);
     }
 
     public void triggerMissiles() {
-        for (Missile missile : activeMissiles) {
-
+        while (activeMissiles.size() > 0) {
+//            activeMissiles.values().
         }
     }
 
@@ -72,14 +74,22 @@ public class MissileCommand extends PApplet{
                 new Ballista((float)(SCREEN_WIDTH * 0.5), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, 5),
                 new Ballista((float)(SCREEN_WIDTH * 0.9), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, 5)
         };
-        city = new Infrastructure[]{};
+        city = new Infrastructure[]{
+                new Infrastructure((float)(SCREEN_WIDTH * 0.2), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, CITY_SCORE),
+                new Infrastructure((float)(SCREEN_WIDTH * 0.3), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, CITY_SCORE),
+                new Infrastructure((float)(SCREEN_WIDTH * 0.4), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, CITY_SCORE),
+                new Infrastructure((float)(SCREEN_WIDTH * 0.6), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, CITY_SCORE),
+                new Infrastructure((float)(SCREEN_WIDTH * 0.7), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, CITY_SCORE),
+                new Infrastructure((float)(SCREEN_WIDTH * 0.8), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, CITY_SCORE)
+        };
         meteoriteVelocityRange = new int[]{10, 20};
-        activeMissiles = new LinkedList<>();
+        activeMissiles = new LinkedHashMap<>();
         enemies = new LinkedHashMap<>();
         score = 0;
         scoreMultiplier = 1;
         consumedPoints = 0;
         activeBallista = 0;
+        missilesTriggered = false;
     }
 
     public void draw(){
@@ -88,17 +98,18 @@ public class MissileCommand extends PApplet{
         for (Ballista value : ballista) {
             circle(value.getPosition().x, value.getPosition().y, BALLISTA_RADII);
         }
-        for (Missile missile : activeMissiles) {
+        for (Infrastructure value : city) {
+            circle(value.getPosition().x, value.getPosition().y, CITY_RADII);
+        }
+        for (Missile missile : activeMissiles.values()) {
+            if (missilesTriggered) {
+                triggerMissiles();
+            }
             circle(missile.getPosition().x, missile.getPosition().y, MISSILE_RADII);
             missile.integrate();
         }
 
         forceRegistry.updateForces() ;
-
-    }
-
-    // When mouse is pressed, store x, y coords
-    public void mousePressed() {
 
     }
 
@@ -120,7 +131,7 @@ public class MissileCommand extends PApplet{
                 activeBallista = 2;
                 break;
             case TRIGGER:
-                triggerMissiles();
+                missilesTriggered = true;
                 break;
         }
         System.out.println("Active Ballista: " + activeBallista);

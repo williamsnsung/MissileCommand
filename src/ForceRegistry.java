@@ -28,13 +28,6 @@ class ForceRegistry {
     }
 
     /**
-     * Clear all registrations from the registry
-     */
-    void clear() {
-        registrations.clear() ;
-    }
-
-    /**
      * Calls all force generators to update the forces of their
      *  corresponding particles.
      */

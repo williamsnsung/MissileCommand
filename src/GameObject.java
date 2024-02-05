@@ -3,7 +3,7 @@ import processing.core.PVector;
 
 // a representation of a point mass
 class GameObject {
-    public PVector position, velocity ;
+    protected PVector position, velocity ;
     private PVector forceAccumulator ;
     public final float invMass ;
     private static int idCount = 0;
