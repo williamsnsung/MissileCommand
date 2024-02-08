@@ -203,7 +203,7 @@ public class MissileCommand extends PApplet{
     }
 
     public static void main(String[] passedArgs) {
-        String[] appletArgs = new String[] { "MissileCommand" };
+        String[] appletArgs = new String[] { new Object(){}.getClass().getEnclosingClass().getSimpleName() };
         PApplet.main(appletArgs);
     }
 }
