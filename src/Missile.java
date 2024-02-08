@@ -7,19 +7,17 @@ public class Missile extends GameObject{
     private final int explosionRadius;
     private int explosionState;
 
-    Missile(float x, float y, float xVel, float yVel, float invM, int explosionRadius) {
+    Missile(float x, float y, float xVel, float yVel, float invM, int explosionRadius, int explosionState) {
         super(x, y, xVel, yVel, invM);
         this.explosionRadius = explosionRadius;
-        explosionState = 10;
+        this.explosionState = explosionState;
     }
 
     public LinkedList<Missile> explode(PApplet sketch, Ballista[] ballistas, Infrastructure[] cities,
                         LinkedHashMap<Integer, EnemyMissile> enemies, LinkedHashMap<Integer, Missile> activeMissiles,
-                        LinkedHashMap<Integer, Missile> exploding) {
+                        LinkedHashMap<Integer, Missile> triggeredMissiles) {
 
         float curRadius = (float) explosionRadius / explosionState;
-        LinkedList<EnemyMissile> enemiesToRemove = new LinkedList<>();
-        LinkedList<Missile> missilesToRemove = new LinkedList<>();
         LinkedList<Missile> toExplode = new LinkedList<>();
 
         sketch.circle(this.position.x, this.position.y, curRadius);
@@ -36,26 +34,24 @@ public class Missile extends GameObject{
         }
         for (EnemyMissile enemy : enemies.values()) {
             if (this.position.dist(enemy.getPosition()) < curRadius) {
-                enemiesToRemove.add(enemy);
+                toExplode.add(enemy);
             }
         }
         for (Missile missile : activeMissiles.values()) {
             if (this != missile && this.position.dist(missile.getPosition()) < curRadius) {
-               missilesToRemove.add(missile);
+               toExplode.add(missile);
             }
         }
 
-        for (EnemyMissile enemyMissile : enemiesToRemove) {
-            toExplode.add(enemyMissile);
-            enemies.remove(enemyMissile.getId());
+        for (Missile missile : triggeredMissiles.values()) {
+            if (this != missile && this.position.dist(missile.getPosition()) < curRadius) {
+                toExplode.add(missile);
+            }
         }
 
-        for (Missile missile : missilesToRemove) {
-            toExplode.add(missile);
-            activeMissiles.remove(missile.getId());
+        if (explosionState > 1) {
+            explosionState--;
         }
-
-        explosionState--;
         return toExplode;
     }
 
@@ -66,4 +62,5 @@ public class Missile extends GameObject{
     public int getExplosionState() {
         return this.explosionState;
     }
+
 }
