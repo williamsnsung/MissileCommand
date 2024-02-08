@@ -1,19 +1,29 @@
 import processing.core.PApplet;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 public class Missile extends GameObject{
-    private static final float EXPLOSION_RADIUS = 12;
+    private final int explosionRadius;
     private int explosionState;
 
-    Missile(float x, float y, float xVel, float yVel, float invM) {
+    Missile(float x, float y, float xVel, float yVel, float invM, int explosionRadius) {
         super(x, y, xVel, yVel, invM);
-        explosionState = 4;
+        this.explosionRadius = explosionRadius;
+        explosionState = 10;
     }
 
-    public void explode(Ballista[] ballistas, Infrastructure[] cities,
-                       LinkedHashMap<Integer, EnemyMissile> enemies, LinkedHashMap<Integer, Missile> activeMissiles) {
-        float curRadius = EXPLOSION_RADIUS / explosionState;
+    public LinkedList<Missile> explode(PApplet sketch, Ballista[] ballistas, Infrastructure[] cities,
+                        LinkedHashMap<Integer, EnemyMissile> enemies, LinkedHashMap<Integer, Missile> activeMissiles,
+                        LinkedHashMap<Integer, Missile> exploding) {
+
+        float curRadius = (float) explosionRadius / explosionState;
+        LinkedList<EnemyMissile> enemiesToRemove = new LinkedList<>();
+        LinkedList<Missile> missilesToRemove = new LinkedList<>();
+        LinkedList<Missile> toExplode = new LinkedList<>();
+
+        sketch.circle(this.position.x, this.position.y, curRadius);
+
         for (Ballista ballista : ballistas) {
             if (this.position.dist(ballista.getPosition()) < curRadius) {
                 ballista.die();
@@ -26,15 +36,34 @@ public class Missile extends GameObject{
         }
         for (EnemyMissile enemy : enemies.values()) {
             if (this.position.dist(enemy.getPosition()) < curRadius) {
-                enemy.explode(ballistas, cities, enemies, activeMissiles);
+                enemiesToRemove.add(enemy);
             }
         }
         for (Missile missile : activeMissiles.values()) {
             if (this != missile && this.position.dist(missile.getPosition()) < curRadius) {
-                missile.explode(ballistas, cities, enemies, activeMissiles);
+               missilesToRemove.add(missile);
             }
         }
 
+        for (EnemyMissile enemyMissile : enemiesToRemove) {
+            toExplode.add(enemyMissile);
+            enemies.remove(enemyMissile.getId());
+        }
+
+        for (Missile missile : missilesToRemove) {
+            toExplode.add(missile);
+            activeMissiles.remove(missile.getId());
+        }
+
         explosionState--;
+        return toExplode;
+    }
+
+    public void draw(PApplet sketch, int MISSILE_RADII) {
+        sketch.circle(this.position.x, this.position.y, MISSILE_RADII);
+    }
+
+    public int getExplosionState() {
+        return this.explosionState;
     }
 }

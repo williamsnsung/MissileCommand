@@ -10,6 +10,10 @@ public class Infrastructure extends GameObject{
         this.score = score;
     }
 
+    public void draw(PApplet sketch, int CITY_RADII) {
+        sketch.circle(this.position.x, this.position.y, CITY_RADII);
+    }
+
     public int getScore() {
         return this.score;
     }

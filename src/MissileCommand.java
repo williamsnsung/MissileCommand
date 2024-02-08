@@ -1,8 +1,10 @@
 import processing.core.PApplet;
 import processing.core.PVector;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -19,6 +21,7 @@ public class MissileCommand extends PApplet{
     final int MISSILE_RADII = 10;
     final float MISSILE_VELOCITY = 28;
     final float INVERTED_MISSILE_MASS = 0.5f;
+    final int EXPLOSION_RADIUS = 50;
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
     int xStart, yStart, xEnd, yEnd ;
@@ -26,32 +29,44 @@ public class MissileCommand extends PApplet{
     // Holds all the force generators and the particles they apply to
     ForceRegistry forceRegistry ;
     int wave, meteorsPerWave, score, scoreMultiplier, consumedPoints, activeBallista;
-    Ballista[] ballista;
-    Infrastructure[] city;
+    Ballista[] ballistas;
+    Infrastructure[] cities;
     int[] meteoriteVelocityRange;
+    LinkedHashMap<Integer, Missile> exploding;
+    LinkedHashMap<Integer, Missile> triggeredMissiles;
     LinkedHashMap<Integer, Missile> activeMissiles;
     LinkedHashMap<Integer, EnemyMissile> enemies;
-    boolean missilesTriggered;
 
+    public <K, V> V popFirst(LinkedHashMap<K, V> hashMap){
+        if (hashMap.isEmpty()) {
+            return null;
+        }
+        Map.Entry<K, V> res = hashMap.entrySet().iterator().next();
+
+        // Remove the first entry
+        hashMap.remove(res.getKey());
+        return res.getValue();
+    }
 
     public void fireMissile(float mouseX, float mouseY) {
         PVector velocity = new PVector(mouseX, mouseY);
-        velocity.sub(ballista[activeBallista].getPosition());
+        velocity.sub(ballistas[activeBallista].getPosition());
         velocity.normalize();
         System.out.println(velocity);
         velocity.mult(MISSILE_VELOCITY);
-        float ballistaX = ballista[activeBallista].getPosition().x;
-        float ballistaY = ballista[activeBallista].getPosition().y;
-        Missile missile = new Missile(ballistaX, ballistaY, velocity.x, velocity.y, INVERTED_MISSILE_MASS);
+        float ballistaX = ballistas[activeBallista].getPosition().x;
+        float ballistaY = ballistas[activeBallista].getPosition().y;
+        Missile missile = new Missile(ballistaX, ballistaY, velocity.x, velocity.y, INVERTED_MISSILE_MASS, EXPLOSION_RADIUS);
         activeMissiles.put(missile.getId(), missile);
         forceRegistry.add(missile, gravity);
         forceRegistry.add(missile, drag);
     }
 
     public void triggerMissiles() {
-        while (activeMissiles.size() > 0) {
-//            activeMissiles.values().
+        for (Missile missile : activeMissiles.values()) {
+            triggeredMissiles.put(missile.getId(), missile);
         }
+        activeMissiles = new LinkedHashMap<>();
     }
 
     public void isGameOver() {
@@ -69,12 +84,12 @@ public class MissileCommand extends PApplet{
         forceRegistry = new ForceRegistry() ;
         wave = 0;
         meteorsPerWave = 1;
-        ballista = new Ballista[]{
+        ballistas = new Ballista[]{
                 new Ballista((float)(SCREEN_WIDTH * 0.1), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, 5),
                 new Ballista((float)(SCREEN_WIDTH * 0.5), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, 5),
                 new Ballista((float)(SCREEN_WIDTH * 0.9), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, 5)
         };
-        city = new Infrastructure[]{
+        cities = new Infrastructure[]{
                 new Infrastructure((float)(SCREEN_WIDTH * 0.2), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, CITY_SCORE),
                 new Infrastructure((float)(SCREEN_WIDTH * 0.3), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, CITY_SCORE),
                 new Infrastructure((float)(SCREEN_WIDTH * 0.4), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, CITY_SCORE),
@@ -84,30 +99,80 @@ public class MissileCommand extends PApplet{
         };
         meteoriteVelocityRange = new int[]{10, 20};
         activeMissiles = new LinkedHashMap<>();
+        exploding = new LinkedHashMap<>();
+        triggeredMissiles = new LinkedHashMap<>();
         enemies = new LinkedHashMap<>();
         score = 0;
         scoreMultiplier = 1;
         consumedPoints = 0;
         activeBallista = 0;
-        missilesTriggered = false;
     }
 
     public void draw(){
         background(0);
         rect(0, (float)(SCREEN_HEIGHT * 0.9), SCREEN_WIDTH, (float)(SCREEN_HEIGHT * 0.1));
-        for (Ballista value : ballista) {
-            circle(value.getPosition().x, value.getPosition().y, BALLISTA_RADII);
+        for (Ballista ballista : ballistas) {
+            ballista.draw(this, BALLISTA_RADII);
         }
-        for (Infrastructure value : city) {
-            circle(value.getPosition().x, value.getPosition().y, CITY_RADII);
+        for (Infrastructure city : cities) {
+            city.draw(this, CITY_RADII);
         }
+        if (!triggeredMissiles.isEmpty()) {
+            Missile activatedMissile = popFirst(triggeredMissiles);
+            exploding.put(activatedMissile.getId(), activatedMissile);
+        }
+
+        LinkedList<Missile> surfaceMissiles = new LinkedList<>();
         for (Missile missile : activeMissiles.values()) {
-            if (missilesTriggered) {
-                triggerMissiles();
+            boolean isSurfaceMissile = false;
+            if (missile.position.y > (float)(SCREEN_HEIGHT * 0.9)) {
+                surfaceMissiles.add(missile);
+                isSurfaceMissile = true;
             }
-            circle(missile.getPosition().x, missile.getPosition().y, MISSILE_RADII);
-            missile.integrate();
+            if (!isSurfaceMissile) {
+                missile.draw(this, MISSILE_RADII);
+                missile.integrate();
+            }
         }
+        for (Missile surfaceMissile : surfaceMissiles) {
+            activeMissiles.remove(surfaceMissile.getId());
+            exploding.put(surfaceMissile.getId(), surfaceMissile);
+        }
+
+        if (!exploding.isEmpty()) {
+            LinkedList<Missile> toExplode = new LinkedList<>();
+            LinkedList<Missile> exploded = new LinkedList<>();
+
+            for (Missile missile : exploding.values()) {
+                toExplode =  missile.explode(this, ballistas, cities, enemies, activeMissiles, exploding);
+                if (missile.getExplosionState() == 0) {
+                    exploded.add(missile);
+                }
+            }
+
+            while (!exploded.isEmpty() || !toExplode.isEmpty()) {
+                if (!exploded.isEmpty()) {
+                    for (Missile missile : exploded) {
+                        exploding.remove(missile.getId());
+                    }
+                    exploded = new LinkedList<>();
+                }
+                if (!toExplode.isEmpty()) {
+                    for (Missile missile : toExplode) {
+                        exploding.put(missile.getId(), missile);
+                        if (activeMissiles.containsKey(missile.getId())) {
+                            activeMissiles.remove(missile.getId());
+                        }
+                        else {
+                            enemies.remove(missile.getId());
+                        }
+                    }
+                    toExplode = new LinkedList<>();
+                }
+            }
+        }
+
+
 
         forceRegistry.updateForces() ;
 
@@ -131,7 +196,7 @@ public class MissileCommand extends PApplet{
                 activeBallista = 2;
                 break;
             case TRIGGER:
-                missilesTriggered = true;
+                triggerMissiles();
                 break;
         }
         System.out.println("Active Ballista: " + activeBallista);

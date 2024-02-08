@@ -15,4 +15,8 @@ public class Ballista extends Infrastructure{
     public void decrementMissiles() {
         this.missiles--;
     }
+
+    public void draw(PApplet sketch, int BALLISTA_RADII) {
+        sketch.circle(this.position.x, this.position.y, BALLISTA_RADII);
+    }
 }
