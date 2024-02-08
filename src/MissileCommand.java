@@ -109,6 +109,7 @@ public class MissileCommand extends PApplet{
     }
 
     public void draw(){
+        cursor(CROSS);
         background(0);
         rect(0, (float)(SCREEN_HEIGHT * 0.9), SCREEN_WIDTH, (float)(SCREEN_HEIGHT * 0.1));
         for (Ballista ballista : ballistas) {
@@ -180,7 +181,6 @@ public class MissileCommand extends PApplet{
 
     // When mouse is released create new vector relative to stored x, y coords
     public void mouseReleased() {
-        System.out.println(mouseX + " " + mouseY);
         fireMissile(mouseX, mouseY);
     }
 
@@ -199,7 +199,6 @@ public class MissileCommand extends PApplet{
                 triggerMissiles();
                 break;
         }
-        System.out.println("Active Ballista: " + activeBallista);
     }
 
     public static void main(String[] passedArgs) {
