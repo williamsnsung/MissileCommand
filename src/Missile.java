@@ -23,12 +23,12 @@ public class Missile extends GameObject{
         sketch.circle(this.position.x, this.position.y, curRadius);
 
         for (Ballista ballista : ballistas) {
-            if (this.position.dist(ballista.getPosition()) < curRadius) {
+            if (this.position.dist(ballista.getPosition()) < curRadius - ballista.getRadius()) {
                 ballista.die();
             }
         }
         for (Infrastructure city : cities) {
-            if (this.position.dist(city.getPosition()) < curRadius) {
+            if (this.position.dist(city.getPosition()) < curRadius - city.getRadius()) {
                 city.die();
             }
         }

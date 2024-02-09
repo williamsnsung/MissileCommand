@@ -3,15 +3,23 @@ import processing.core.PApplet;
 public class Infrastructure extends GameObject{
     private boolean alive;
     private final int score;
+    private final int radius;
 
-    Infrastructure(float x, float y, float xVel, float yVel, float invM, int score) {
+    Infrastructure(float x, float y, float xVel, float yVel, float invM, int score, int radius) {
         super(x, y, xVel, yVel, invM);
         this.alive = true;
         this.score = score;
+        this.radius = radius;
     }
 
-    public void draw(PApplet sketch, int CITY_RADII) {
-        sketch.circle(this.position.x, this.position.y, CITY_RADII);
+    public void draw(PApplet sketch) {
+        if (this.alive) {
+            sketch.circle(this.position.x, this.position.y, radius);
+        }
+    }
+
+    public int getRadius() {
+        return this.radius;
     }
 
     public int getScore() {

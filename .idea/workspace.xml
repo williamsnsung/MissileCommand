@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a06ee47c-f8e3-433d-986a-1c40ea6e7acb" name="Changes" comment="Missiles explode in sequence on trigger with variable lag. Variable explosion duration. Missiles explode on contact with explosion.">
+    <list default="true" id="a06ee47c-f8e3-433d-986a-1c40ea6e7acb" name="Changes" comment="Limited ammunition per ballista done.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Ballista.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ballista.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Infrastructure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Infrastructure.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Missile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Missile.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MissileCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MissileCommand.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -110,7 +112,7 @@
       <updated>1706888373212</updated>
       <workItem from="1706888374805" duration="13187000" />
       <workItem from="1707017879454" duration="25315000" />
-      <workItem from="1707422805262" duration="8908000" />
+      <workItem from="1707422805262" duration="9866000" />
     </task>
     <task id="LOCAL-00001" summary="Classes and settings created. To do bare-bones implementation.">
       <option name="closed" value="true" />
@@ -128,7 +130,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707429200196</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Limited ammunition per ballista done.">
+      <option name="closed" value="true" />
+      <created>1707474495477</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1707474495477</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -137,7 +147,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Classes and settings created. To do bare-bones implementation." />
     <MESSAGE value="Missiles explode in sequence on trigger with variable lag. Variable explosion duration. Missiles explode on contact with explosion." />
-    <option name="LAST_COMMIT_MESSAGE" value="Missiles explode in sequence on trigger with variable lag. Variable explosion duration. Missiles explode on contact with explosion." />
+    <MESSAGE value="Limited ammunition per ballista done." />
+    <option name="LAST_COMMIT_MESSAGE" value="Limited ammunition per ballista done." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
