@@ -36,6 +36,9 @@ public class Missile extends GameObject{
             if (this.position.dist(enemy.getPosition()) < curRadius) {
                 toExplode.add(enemy);
             }
+            else if (enemy.position.dist(this.position) < enemy.) {
+
+            }
         }
         for (Missile missile : activeMissiles.values()) {
             if (this != missile && this.position.dist(missile.getPosition()) < curRadius) {

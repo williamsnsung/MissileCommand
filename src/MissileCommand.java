@@ -26,7 +26,7 @@ public class MissileCommand extends PApplet{
     final int METEORITE_EXPLOSION_STATES = 5;
     final int EXPLOSION_STATES = 10;
     final int TRIGGER_SEQUENCE_LAG = 10;
-    final int METEORITE_SPAWN_LAG = 30;
+    final int METEORITE_SPAWN_LAG = 75;
     final int MAX_EXPLOSION_DURATION = 20;
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
@@ -134,6 +134,9 @@ public class MissileCommand extends PApplet{
 
         background(0);
         cursor(CROSS);
+        if (waveManager.getMeteorsPerWave() == waveManager.getMeteorsSpawned() && waveManager.getEnemiesAlive() == 0) {
+            waveManager.newWave();
+        }
 
         rect(0, (float)(SCREEN_HEIGHT * 0.9), SCREEN_WIDTH, (float)(SCREEN_HEIGHT * 0.1));
         for (Ballista ballista : ballistas) {
@@ -150,6 +153,9 @@ public class MissileCommand extends PApplet{
         }
 
         if (!exploded.isEmpty() && explosionLag >= MAX_EXPLOSION_DURATION) {
+            if (exploded.getFirst() instanceof EnemyMissile) {
+                waveManager.enemyKilled();
+            }
             exploded.removeFirst();
             explosionLag = 0;
         }
@@ -190,13 +196,10 @@ public class MissileCommand extends PApplet{
             missile.integrate();
         }
 
-
-
         for (Missile surfaceMissile : surfaceMissiles) {
             activeMissiles.remove(surfaceMissile.getId());
             exploding.put(surfaceMissile.getId(), surfaceMissile);
         }
-
 
         if (!exploding.isEmpty()) {
             LinkedList<Missile> toExplode = new LinkedList<>();

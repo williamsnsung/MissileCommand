@@ -80,8 +80,14 @@ public class WaveManager {
         forceRegistry.add(enemyMissile, drag);
     }
 
-    public int getWave() {
-        return this.wave;
+    public void newWave() {
+        this.wave++;
+        this.meteorsPerWave = fib(wave + 2);
+        this.meteorsSpawned = 0;
+        this.enemiesAlive = 0;
+        for (Ballista ballista : ballistas) {
+            ballista.restockMissiles();
+        }
     }
 
     public int getMeteorsPerWave() {
@@ -94,5 +100,9 @@ public class WaveManager {
 
     public int getEnemiesAlive() {
         return this.enemiesAlive;
+    }
+
+    public void enemyKilled() {
+        this.enemiesAlive--;
     }
 }
