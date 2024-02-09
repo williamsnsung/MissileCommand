@@ -7,6 +7,12 @@ public class EnemyMissile extends Missile{
         this.score = score;
     }
 
+    public void draw(PApplet sketch, int MISSILE_RADII) {
+        sketch.fill(255, 0, 0);
+        sketch.circle(this.position.x, this.position.y, MISSILE_RADII);
+        sketch.fill(255, 255, 255);
+    }
+
     public int getScore() {
         return this.score;
     }

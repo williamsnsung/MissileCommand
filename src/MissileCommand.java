@@ -17,19 +17,26 @@ public class MissileCommand extends PApplet{
     final char TRIGGER = ' ';
     final int MISSILE_RADII = 10;
     final float MISSILE_VELOCITY = 28;
+    final float INITIAL_METEORITE_VELOCITY = 10;
     final float INVERTED_MISSILE_MASS = 0.5f;
+    final float INVERTED_METEORITE_MASS = 0.5f;
     final int EXPLOSION_RADIUS = 50;
+    final int METEORITE_EXPLOSION_RADIUS = 25;
+    final int METEORITE_RADII = 20;
+    final int METEORITE_EXPLOSION_STATES = 5;
     final int EXPLOSION_STATES = 10;
     final int TRIGGER_SEQUENCE_LAG = 10;
+    final int METEORITE_SPAWN_LAG = 30;
     final int MAX_EXPLOSION_DURATION = 20;
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
+    final int METEORITE_SCORE = 25;
     int xStart, yStart, xEnd, yEnd ;
-    int triggerLag, explosionLag;
+    int triggerLag, explosionLag, meteoriteLag;
 
     // Holds all the force generators and the particles they apply to
     ForceRegistry forceRegistry ;
-    int wave, meteorsPerWave, score, scoreMultiplier, consumedPoints, activeBallista;
+    int score, scoreMultiplier, consumedPoints, activeBallista;
     Ballista[] ballistas;
     Infrastructure[] cities;
     int[] meteoriteVelocityRange;
@@ -38,6 +45,8 @@ public class MissileCommand extends PApplet{
     LinkedHashMap<Integer, Missile> activeMissiles;
     LinkedHashMap<Integer, EnemyMissile> enemies;
     LinkedList<Missile> exploded;
+    WaveManager waveManager;
+
 
     public <K, V> V popFirst(LinkedHashMap<K, V> hashMap){
         if (hashMap.isEmpty()) {
@@ -88,8 +97,6 @@ public class MissileCommand extends PApplet{
         Drag drag = new Drag(10, 10) ;
         //Create the ForceRegistry
         forceRegistry = new ForceRegistry() ;
-        wave = 0;
-        meteorsPerWave = 1;
         ballistas = new Ballista[]{
                 new Ballista((float)(SCREEN_WIDTH * 0.1), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, 5, BALLISTA_RADII),
                 new Ballista((float)(SCREEN_WIDTH * 0.5), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, 5, BALLISTA_RADII),
@@ -115,6 +122,10 @@ public class MissileCommand extends PApplet{
         activeBallista = 0;
         triggerLag = 0;
         explosionLag = 0;
+        meteoriteLag = 10000000;
+        waveManager = new WaveManager(this, SCREEN_HEIGHT, SCREEN_WIDTH, ballistas, cities,
+                INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
+                INITIAL_METEORITE_VELOCITY, forceRegistry, gravity, drag, enemies);
     }
 
     public void draw(){
@@ -196,7 +207,18 @@ public class MissileCommand extends PApplet{
                 toExplode = new LinkedList<>();
             }
         }
+
+        if (waveManager.getMeteorsSpawned() < waveManager.getMeteorsPerWave() && meteoriteLag > METEORITE_SPAWN_LAG) {
+            meteoriteLag = 0;
+            waveManager.spawnMeteorite();
+        }
+        for (EnemyMissile enemyMissile : enemies.values()) {
+            enemyMissile.draw(this, METEORITE_RADII);
+            enemyMissile.integrate();
+        }
+
         triggerLag++;
+        meteoriteLag++;
         forceRegistry.updateForces() ;
 
     }
