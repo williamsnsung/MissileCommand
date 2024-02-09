@@ -4,14 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a06ee47c-f8e3-433d-986a-1c40ea6e7acb" name="Changes" comment="Classes and settings created. To do bare-bones implementation.">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/core.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/EnemyMissile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/EnemyMissile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Missile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Missile.java" afterDir="false" />
+    <list default="true" id="a06ee47c-f8e3-433d-986a-1c40ea6e7acb" name="Changes" comment="Missiles explode in sequence on trigger with variable lag. Variable explosion duration. Missiles explode on contact with explosion.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Ballista.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Ballista.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MissileCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MissileCommand.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,6 +23,20 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "williamsnsung"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="7f60da74-1b02-46ef-8a7a-3afb68090ed1" />
+        <option name="url" value="git@github.com:williamsnsung/MissileCommand.git" />
+      </UrlAndAccount>
+    </option>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -101,7 +110,7 @@
       <updated>1706888373212</updated>
       <workItem from="1706888374805" duration="13187000" />
       <workItem from="1707017879454" duration="25315000" />
-      <workItem from="1707422805262" duration="5649000" />
+      <workItem from="1707422805262" duration="8908000" />
     </task>
     <task id="LOCAL-00001" summary="Classes and settings created. To do bare-bones implementation.">
       <option name="closed" value="true" />
@@ -111,7 +120,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707016541354</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Missiles explode in sequence on trigger with variable lag. Variable explosion duration. Missiles explode on contact with explosion.">
+      <option name="closed" value="true" />
+      <created>1707429200196</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1707429200196</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -119,7 +136,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Classes and settings created. To do bare-bones implementation." />
-    <option name="LAST_COMMIT_MESSAGE" value="Classes and settings created. To do bare-bones implementation." />
+    <MESSAGE value="Missiles explode in sequence on trigger with variable lag. Variable explosion duration. Missiles explode on contact with explosion." />
+    <option name="LAST_COMMIT_MESSAGE" value="Missiles explode in sequence on trigger with variable lag. Variable explosion duration. Missiles explode on contact with explosion." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -51,10 +51,13 @@ public class MissileCommand extends PApplet{
     }
 
     public void fireMissile(float mouseX, float mouseY) {
+        if (ballistas[activeBallista].getMissiles() == 0) {
+            return;
+        }
+        ballistas[activeBallista].decrementMissiles();
         PVector velocity = new PVector(mouseX, mouseY);
         velocity.sub(ballistas[activeBallista].getPosition());
         velocity.normalize();
-        System.out.println(velocity);
         velocity.mult(MISSILE_VELOCITY);
         float ballistaX = ballistas[activeBallista].getPosition().x;
         float ballistaY = ballistas[activeBallista].getPosition().y;
@@ -115,12 +118,15 @@ public class MissileCommand extends PApplet{
     }
 
     public void draw(){
+
         cursor(CROSS);
         background(0);
+
         rect(0, (float)(SCREEN_HEIGHT * 0.9), SCREEN_WIDTH, (float)(SCREEN_HEIGHT * 0.1));
         for (Ballista ballista : ballistas) {
             ballista.draw(this, BALLISTA_RADII);
         }
+
         for (Infrastructure city : cities) {
             city.draw(this, CITY_RADII);
         }
