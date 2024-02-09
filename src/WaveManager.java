@@ -43,6 +43,7 @@ public class WaveManager {
         this.enemies = enemies;
     }
 
+    // https://r-knott.surrey.ac.uk/Fibonacci/fibFormula.html [09/02/2024]
     public int fib(int n) {
         double phi = 1.6180339887;
         double sqrt5 = 2.2360679775;
@@ -61,17 +62,19 @@ public class WaveManager {
         PVector velocity;
         int target = (int) sketch.random(ballistas.length + cities.length);
         if (target < cities.length) {
-            velocity = pos.add(cities[target].getPosition());
+            velocity = pos.sub(cities[target].getPosition());
         }
         else {
-            velocity = pos.add(ballistas[target % cities.length].getPosition());
+            velocity = pos.sub(ballistas[target % cities.length].getPosition());
         }
         velocity.normalize();
-        velocity.mult(newMissileVelocity());
+//        velocity.mult(newMissileVelocity());
         this.meteorsSpawned++;
         this.enemiesAlive++;
         EnemyMissile enemyMissile = new EnemyMissile(x, y, velocity.x, velocity.y,
                 INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES);
+//        EnemyMissile enemyMissile = new EnemyMissile(x, y, 0, 0,
+//                INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES);
         enemies.put(enemyMissile.getId(), enemyMissile);
         forceRegistry.add(enemyMissile, gravity);
         forceRegistry.add(enemyMissile, drag);

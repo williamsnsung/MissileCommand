@@ -84,6 +84,10 @@ public class MissileCommand extends PApplet{
         activeMissiles = new LinkedHashMap<>();
     }
 
+    public boolean missileOnSurface(Missile missile) {
+        return missile.position.y > (float) (SCREEN_HEIGHT * 0.9);
+    }
+
     public void isGameOver() {
 
     }
@@ -93,8 +97,6 @@ public class MissileCommand extends PApplet{
         //Create a gravitational force
         Gravity gravity = new Gravity(new PVector(0f, .1f)) ;
         //Create a drag force
-        //NB Increase k1, k2 to see an effect
-        Drag drag = new Drag(10, 10) ;
         //Create the ForceRegistry
         forceRegistry = new ForceRegistry() ;
         ballistas = new Ballista[]{
@@ -152,6 +154,10 @@ public class MissileCommand extends PApplet{
             explosionLag = 0;
         }
 
+        if (waveManager.getMeteorsSpawned() < waveManager.getMeteorsPerWave() && meteoriteLag > METEORITE_SPAWN_LAG) {
+            meteoriteLag = 0;
+            waveManager.spawnMeteorite();
+        }
 
         if (!triggeredMissiles.isEmpty() && triggerLag >= TRIGGER_SEQUENCE_LAG) {
             triggerLag = 0;
@@ -161,20 +167,31 @@ public class MissileCommand extends PApplet{
 
         LinkedList<Missile> surfaceMissiles = new LinkedList<>();
         for (Missile missile : activeMissiles.values()) {
-            boolean isSurfaceMissile = false;
-            if (missile.position.y > (float)(SCREEN_HEIGHT * 0.9)) {
-                surfaceMissiles.add(missile);
-                isSurfaceMissile = true;
-            }
-            if (!isSurfaceMissile) {
+            if (!missileOnSurface(missile)) {
                 missile.draw(this, MISSILE_RADII);
                 missile.integrate();
             }
+            else {
+                surfaceMissiles.add(missile);
+            }
         }
+        for (EnemyMissile enemyMissile : enemies.values()) {
+            if (!missileOnSurface(enemyMissile)) {
+                enemyMissile.draw(this, METEORITE_RADII);
+                enemyMissile.integrate();
+            }
+            else {
+                surfaceMissiles.add(enemyMissile);
+            }
+        }
+
         for (Missile missile : triggeredMissiles.values()) {
             missile.draw(this, MISSILE_RADII);
             missile.integrate();
         }
+
+
+
         for (Missile surfaceMissile : surfaceMissiles) {
             activeMissiles.remove(surfaceMissile.getId());
             exploding.put(surfaceMissile.getId(), surfaceMissile);
@@ -206,15 +223,6 @@ public class MissileCommand extends PApplet{
                 }
                 toExplode = new LinkedList<>();
             }
-        }
-
-        if (waveManager.getMeteorsSpawned() < waveManager.getMeteorsPerWave() && meteoriteLag > METEORITE_SPAWN_LAG) {
-            meteoriteLag = 0;
-            waveManager.spawnMeteorite();
-        }
-        for (EnemyMissile enemyMissile : enemies.values()) {
-            enemyMissile.draw(this, METEORITE_RADII);
-            enemyMissile.integrate();
         }
 
         triggerLag++;
