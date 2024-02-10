@@ -33,7 +33,7 @@ public class MissileCommand extends PApplet{
     final int METEORITE_SCORE = 25;
     int triggerLag, explosionLag, meteoriteLag;
     ForceRegistry forceRegistry ;
-    int scoreMultiplier, consumedPoints, activeBallista;
+    int activeBallista;
     Ballista[] ballistas;
     Infrastructure[] cities;
     int[] meteoriteVelocityRange;
@@ -81,12 +81,8 @@ public class MissileCommand extends PApplet{
         activeMissiles = new LinkedHashMap<>();
     }
 
-    public boolean missileOnSurface(Missile missile) {
-        return missile.position.y > (float) (SCREEN_HEIGHT * 0.9);
-    }
-
-    public void isGameOver() {
-
+    public boolean missileInAir(Missile missile) {
+        return !(missile.position.y > (float) (SCREEN_HEIGHT * 0.9));
     }
 
     public void settings() {
@@ -115,8 +111,6 @@ public class MissileCommand extends PApplet{
         exploded = new LinkedList<>();
         triggeredMissiles = new LinkedHashMap<>();
         enemies = new LinkedHashMap<>();
-        scoreMultiplier = 1;
-        consumedPoints = 0;
         activeBallista = 0;
         triggerLag = 1000000;
         explosionLag = 0;
@@ -170,7 +164,7 @@ public class MissileCommand extends PApplet{
 
         LinkedList<Missile> collidingMissiles = new LinkedList<>();
         for (Missile missile : activeMissiles.values()) {
-            if (!missileOnSurface(missile)) {
+            if (missileInAir(missile)) {
                 missile.draw(this);
                 missile.integrate();
             }
@@ -191,7 +185,7 @@ public class MissileCommand extends PApplet{
                 }
             }
 
-            if (!missileOnSurface(enemyMissile) && !collision) {
+            if (missileInAir(enemyMissile) && !collision) {
                 enemyMissile.draw(this);
                 enemyMissile.integrate();
             }
@@ -231,18 +225,15 @@ public class MissileCommand extends PApplet{
             for (Missile missile : exploded) {
                 exploding.remove(missile.getId());
             }
-
-            if (!toExplode.isEmpty()) {
-                for (Missile missile : toExplode) {
-                    exploding.put(missile.getId(), missile);
-                    if (activeMissiles.containsKey(missile.getId())) {
-                        activeMissiles.remove(missile.getId());
-                    }
-                    else {
-                        enemies.remove(missile.getId());
-                    }
+            while (!toExplode.isEmpty()) {
+                Missile missile = toExplode.removeFirst();
+                exploding.put(missile.getId(), missile);
+                if (activeMissiles.containsKey(missile.getId())) {
+                    activeMissiles.remove(missile.getId());
                 }
-                toExplode = new LinkedList<>();
+                else {
+                    enemies.remove(missile.getId());
+                }
             }
         }
 

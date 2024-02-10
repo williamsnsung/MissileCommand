@@ -90,9 +90,19 @@ public class WaveManager {
         this.meteoriteVelocity = fib(wave);
         this.meteorsSpawned = 0;
         this.enemiesAlive = 0;
+        int curScore = 0;
+
+        for (Infrastructure city : cities) {
+            if (city.isAlive()) {
+                curScore += city.getScore();
+            }
+        }
+
         for (Ballista ballista : ballistas) {
+            curScore += ballista.getMissiles() * ballista.getScore();
             ballista.restockMissiles();
         }
+        this.score += curScore * getScoreMultiplier();
     }
 
     public int getMeteorsPerWave() {
@@ -119,6 +129,44 @@ public class WaveManager {
     }
 
     public void addScore(int score) {
-        this.score += score;
+        this.score += score * getScoreMultiplier();
+    }
+
+    public boolean gameOver() {
+        int dead = 0;
+        for (Infrastructure city : cities) {
+            if (!city.isAlive()) {
+                dead++;
+            }
+        }
+        return dead == cities.length;
+    }
+
+    private int getScoreMultiplier() {
+        int scoreMultiplier = 1;
+        switch (this.wave) {
+            case (1):
+            case (2):
+                break;
+            case (3):
+            case (4):
+                scoreMultiplier = 2;
+                break;
+            case (5):
+            case (6):
+                scoreMultiplier = 3;
+                break;
+            case (7):
+            case (8):
+                scoreMultiplier = 4;
+                break;
+            case (9):
+            case (10):
+                scoreMultiplier = 5;
+                break;
+            default:
+                scoreMultiplier = 6;
+        }
+        return scoreMultiplier;
     }
 }

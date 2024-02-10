@@ -33,4 +33,8 @@ public class Infrastructure extends GameObject{
     public void revive() {
         this.alive = true;
     }
+
+    public boolean isAlive() {
+        return this.alive;
+    }
 }
