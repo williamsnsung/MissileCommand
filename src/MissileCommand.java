@@ -71,7 +71,7 @@ public class MissileCommand extends PApplet{
         float ballistaX = ballistas[activeBallista].getPosition().x;
         float ballistaY = ballistas[activeBallista].getPosition().y;
         Missile missile = new Missile(ballistaX, ballistaY, velocity.x, velocity.y,
-                INVERTED_MISSILE_MASS, EXPLOSION_RADIUS, EXPLOSION_STATES);
+                INVERTED_MISSILE_MASS, EXPLOSION_RADIUS, EXPLOSION_STATES, MISSILE_RADII);
         activeMissiles.put(missile.getId(), missile);
         forceRegistry.add(missile, gravity);
         forceRegistry.add(missile, drag);
@@ -122,12 +122,12 @@ public class MissileCommand extends PApplet{
         scoreMultiplier = 1;
         consumedPoints = 0;
         activeBallista = 0;
-        triggerLag = 0;
+        triggerLag = 1000000;
         explosionLag = 0;
         meteoriteLag = 10000000;
         waveManager = new WaveManager(this, SCREEN_HEIGHT, SCREEN_WIDTH, ballistas, cities,
                 INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
-                INITIAL_METEORITE_VELOCITY, forceRegistry, gravity, drag, enemies);
+                INITIAL_METEORITE_VELOCITY, forceRegistry, gravity, drag, enemies, METEORITE_RADII);
     }
 
     public void draw(){
@@ -174,7 +174,7 @@ public class MissileCommand extends PApplet{
         LinkedList<Missile> surfaceMissiles = new LinkedList<>();
         for (Missile missile : activeMissiles.values()) {
             if (!missileOnSurface(missile)) {
-                missile.draw(this, MISSILE_RADII);
+                missile.draw(this);
                 missile.integrate();
             }
             else {
@@ -183,7 +183,7 @@ public class MissileCommand extends PApplet{
         }
         for (EnemyMissile enemyMissile : enemies.values()) {
             if (!missileOnSurface(enemyMissile)) {
-                enemyMissile.draw(this, METEORITE_RADII);
+                enemyMissile.draw(this);
                 enemyMissile.integrate();
             }
             else {
@@ -192,7 +192,7 @@ public class MissileCommand extends PApplet{
         }
 
         for (Missile missile : triggeredMissiles.values()) {
-            missile.draw(this, MISSILE_RADII);
+            missile.draw(this);
             missile.integrate();
         }
 

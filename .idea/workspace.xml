@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="a06ee47c-f8e3-433d-986a-1c40ea6e7acb" name="Changes" comment="Missiles fall correctly, though velocity seems to be wrong. Explode on surface too.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/EnemyMissile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/EnemyMissile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Missile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Missile.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MissileCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MissileCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WaveManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WaveManager.java" afterDir="false" />
     </list>
@@ -24,12 +26,12 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "williamsnsung"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;williamsnsung&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings">
     <option name="selectedUrlAndAccountId">
       <UrlAndAccount>
@@ -54,7 +56,7 @@
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Application.Main.executor": "Run",
-    "Application.MissileCommand.executor": "Debug",
+    "Application.MissileCommand.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",

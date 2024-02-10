@@ -8,7 +8,8 @@ public class WaveManager {
     int meteorsPerWave;
     int meteorsSpawned;
     int enemiesAlive;
-    final int SCREEN_WIDTH, SCREEN_HEIGHT, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES;
+    final int SCREEN_WIDTH, SCREEN_HEIGHT, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
+    METEORITE_RADII;
     final float INVERTED_METEORITE_MASS;
     Ballista[] ballistas;
     Infrastructure[] cities;
@@ -22,7 +23,8 @@ public class WaveManager {
     WaveManager(PApplet sketch, int SCREEN_HEIGHT, int SCREEN_WIDTH, Ballista[] ballistas, Infrastructure[] cities,
                 float INVERTED_METEORITE_MASS, int METEORITE_SCORE, int METEORITE_EXPLOSION_RADIUS,
                 int METEORITE_EXPLOSION_STATES, float INITIAL_METEORITE_VELOCITY,
-                ForceRegistry forceRegistry, Gravity gravity, Drag drag, LinkedHashMap<Integer, EnemyMissile> enemies) {
+                ForceRegistry forceRegistry, Gravity gravity, Drag drag, LinkedHashMap<Integer, EnemyMissile> enemies,
+                int METEORITE_RADII) {
         this.sketch = sketch;
         this.SCREEN_WIDTH = SCREEN_WIDTH;
         this.SCREEN_HEIGHT = SCREEN_HEIGHT;
@@ -30,6 +32,7 @@ public class WaveManager {
         this.METEORITE_SCORE = METEORITE_SCORE;
         this.METEORITE_EXPLOSION_RADIUS = METEORITE_EXPLOSION_RADIUS;
         this.METEORITE_EXPLOSION_STATES = METEORITE_EXPLOSION_STATES;
+        this.METEORITE_RADII = METEORITE_RADII;
         this.meteoriteVelocity = INITIAL_METEORITE_VELOCITY;
         this.ballistas = ballistas;
         this.cities = cities;
@@ -72,7 +75,9 @@ public class WaveManager {
         this.meteorsSpawned++;
         this.enemiesAlive++;
         EnemyMissile enemyMissile = new EnemyMissile(x, y, velocity.x, velocity.y,
-                INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES);
+                INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
+                METEORITE_RADII
+                );
 //        EnemyMissile enemyMissile = new EnemyMissile(x, y, 0, 0,
 //                INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES);
         enemies.put(enemyMissile.getId(), enemyMissile);

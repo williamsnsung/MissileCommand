@@ -6,11 +6,14 @@ import java.util.LinkedList;
 public class Missile extends GameObject{
     private final int explosionRadius;
     private int explosionState;
+    private final int RADIUS;
 
-    Missile(float x, float y, float xVel, float yVel, float invM, int explosionRadius, int explosionState) {
+    Missile(float x, float y, float xVel, float yVel, float invM, int explosionRadius, int explosionState,
+            int MISSILE_RADIUS) {
         super(x, y, xVel, yVel, invM);
         this.explosionRadius = explosionRadius;
         this.explosionState = explosionState;
+        this.RADIUS = MISSILE_RADIUS;
     }
 
     public LinkedList<Missile> explode(PApplet sketch, Ballista[] ballistas, Infrastructure[] cities,
@@ -36,9 +39,6 @@ public class Missile extends GameObject{
             if (this.position.dist(enemy.getPosition()) < curRadius) {
                 toExplode.add(enemy);
             }
-            else if (enemy.position.dist(this.position) < enemy.) {
-
-            }
         }
         for (Missile missile : activeMissiles.values()) {
             if (this != missile && this.position.dist(missile.getPosition()) < curRadius) {
@@ -58,12 +58,16 @@ public class Missile extends GameObject{
         return toExplode;
     }
 
-    public void draw(PApplet sketch, int MISSILE_RADII) {
-        sketch.circle(this.position.x, this.position.y, MISSILE_RADII);
+    public void draw(PApplet sketch) {
+        sketch.circle(this.position.x, this.position.y, this.RADIUS);
     }
 
     public int getExplosionState() {
         return this.explosionState;
+    }
+
+    public int getRadius() {
+        return this.RADIUS;
     }
 
 }
