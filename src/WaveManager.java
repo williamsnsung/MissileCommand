@@ -5,10 +5,7 @@ import processing.core.PVector;
 import java.util.LinkedHashMap;
 
 public class WaveManager {
-    int wave;
-    int meteorsPerWave;
-    int meteorsSpawned;
-    int enemiesAlive;
+    int wave, meteorsPerWave, meteorsSpawned, enemiesAlive, score;
     final int SCREEN_WIDTH, SCREEN_HEIGHT, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
     METEORITE_RADII;
     final float INVERTED_METEORITE_MASS;
@@ -46,6 +43,7 @@ public class WaveManager {
         this.gravity = gravity;
         this.drag = drag;
         this.enemies = enemies;
+        this.score = 0;
     }
 
     // https://r-knott.surrey.ac.uk/Fibonacci/fibFormula.html [09/02/2024]
@@ -58,7 +56,7 @@ public class WaveManager {
     }
 
     public float newMissileVelocity() {
-        return sketch.random(meteoriteVelocity, meteoriteVelocity + fib(wave));
+        return sketch.random(meteoriteVelocity * 0.9f, meteoriteVelocity * 1.1f);
     }
 
     public void spawnMeteorite() {
@@ -68,11 +66,9 @@ public class WaveManager {
         PVector velocity;
         int target = (int) sketch.random(ballistas.length + cities.length);
         if (target < cities.length) {
-//            velocity = pos.add(cities[target].getPosition());
             velocity = cities[target].getPosition().sub(pos);
         }
         else {
-//            velocity = pos.add(ballistas[target % cities.length].getPosition());
             velocity = ballistas[target % cities.length].getPosition().sub(pos);
         }
         velocity.normalize();
@@ -91,7 +87,7 @@ public class WaveManager {
     public void newWave() {
         this.wave++;
         this.meteorsPerWave = fib(wave);
-        this.meteoriteVelocity += fib(wave);
+        this.meteoriteVelocity = fib(wave);
         this.meteorsSpawned = 0;
         this.enemiesAlive = 0;
         for (Ballista ballista : ballistas) {
@@ -118,6 +114,11 @@ public class WaveManager {
     public void draw() {
         PFont font = sketch.createFont("Arial",16,true);
         sketch.textFont(font,16);
-        sketch.text("WAVE: " + wave, 5, 20);
+        sketch.text("WAVE: " + this.wave, 5, 20);
+        sketch.text("SCORE: " + this.score, 5, 40);
+    }
+
+    public void addScore(int score) {
+        this.score += score;
     }
 }

@@ -18,7 +18,7 @@ public class Missile extends GameObject{
 
     public LinkedList<Missile> explode(PApplet sketch, Ballista[] ballistas, Infrastructure[] cities,
                         LinkedHashMap<Integer, EnemyMissile> enemies, LinkedHashMap<Integer, Missile> activeMissiles,
-                        LinkedHashMap<Integer, Missile> triggeredMissiles) {
+                        LinkedHashMap<Integer, Missile> triggeredMissiles, WaveManager waveManager) {
 
         float curRadius = (float) explosionRadius / explosionState;
         LinkedList<Missile> toExplode = new LinkedList<>();
@@ -36,8 +36,9 @@ public class Missile extends GameObject{
             }
         }
         for (EnemyMissile enemy : enemies.values()) {
-            if (this.position.dist(enemy.getPosition()) < curRadius) {
+            if (this != enemy && this.position.dist(enemy.getPosition()) < curRadius) {
                 toExplode.add(enemy);
+                waveManager.addScore(enemy.getScore());
             }
         }
         for (Missile missile : activeMissiles.values()) {

@@ -31,12 +31,9 @@ public class MissileCommand extends PApplet{
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
     final int METEORITE_SCORE = 25;
-    int xStart, yStart, xEnd, yEnd ;
     int triggerLag, explosionLag, meteoriteLag;
-
-    // Holds all the force generators and the particles they apply to
     ForceRegistry forceRegistry ;
-    int score, scoreMultiplier, consumedPoints, activeBallista;
+    int scoreMultiplier, consumedPoints, activeBallista;
     Ballista[] ballistas;
     Infrastructure[] cities;
     int[] meteoriteVelocityRange;
@@ -118,7 +115,6 @@ public class MissileCommand extends PApplet{
         exploded = new LinkedList<>();
         triggeredMissiles = new LinkedHashMap<>();
         enemies = new LinkedHashMap<>();
-        score = 0;
         scoreMultiplier = 1;
         consumedPoints = 0;
         activeBallista = 0;
@@ -149,7 +145,7 @@ public class MissileCommand extends PApplet{
         }
 
         for (Missile missile : exploded) {
-            missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles);
+            missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles, waveManager);
             explosionLag++;
         }
 
@@ -182,6 +178,7 @@ public class MissileCommand extends PApplet{
                 collidingMissiles.add(missile);
             }
         }
+
         for (EnemyMissile enemyMissile : enemies.values()) {
             boolean collision = false;
             Missile collider = null;
@@ -189,6 +186,7 @@ public class MissileCommand extends PApplet{
                 collision = enemyMissile.collisionCheck(missile);
                 if (collision) {
                     collider = missile;
+                    waveManager.addScore(enemyMissile.getScore());
                     break;
                 }
             }
@@ -211,7 +209,12 @@ public class MissileCommand extends PApplet{
         }
 
         for (Missile surfaceMissile : collidingMissiles) {
-            activeMissiles.remove(surfaceMissile.getId());
+            if (surfaceMissile instanceof EnemyMissile) {
+                enemies.remove(surfaceMissile.getId());
+            }
+            else {
+                activeMissiles.remove(surfaceMissile.getId());
+            }
             exploding.put(surfaceMissile.getId(), surfaceMissile);
         }
 
@@ -219,7 +222,8 @@ public class MissileCommand extends PApplet{
             LinkedList<Missile> toExplode = new LinkedList<>();
 
             for (Missile missile : exploding.values()) {
-                toExplode =  missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles);
+                toExplode =  missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles,
+                        waveManager);
                 if (missile.getExplosionState() == 1) {
                     exploded.add(missile);
                 }
