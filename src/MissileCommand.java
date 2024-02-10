@@ -1,4 +1,5 @@
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PVector;
 
 import java.util.LinkedHashMap;
@@ -125,124 +126,131 @@ public class MissileCommand extends PApplet{
     public void draw(){
 
         background(0);
-        cursor(CROSS);
-        if (waveManager.getMeteorsPerWave() == waveManager.getMeteorsSpawned() && waveManager.getEnemiesAlive() == 0) {
-            waveManager.newWave();
-        }
-        waveManager.draw();
 
-        rect(0, (float)(SCREEN_HEIGHT * 0.9), SCREEN_WIDTH, (float)(SCREEN_HEIGHT * 0.1));
-        for (int i = 0; i < ballistas.length; i++) {
-            ballistas[i].draw(this, i == activeBallista);
+        if (waveManager.isGameOver()) {
+            PFont font = createFont("Arial",16,true);
+            textFont(font,24);
+            text("GAME OVER", 175, 250);
         }
-
-        for (Infrastructure city : cities) {
-            city.draw(this);
-        }
-
-        for (Missile missile : exploded) {
-            missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles, waveManager);
-            explosionLag++;
-        }
-
-        if (!exploded.isEmpty() && explosionLag >= MAX_EXPLOSION_DURATION) {
-            if (exploded.getFirst() instanceof EnemyMissile) {
-                waveManager.enemyKilled();
+        else {
+            cursor(CROSS);
+            if (waveManager.getMeteorsPerWave() == waveManager.getMeteorsSpawned() && waveManager.getEnemiesAlive() == 0) {
+                waveManager.newWave();
             }
-            exploded.removeFirst();
-            explosionLag = 0;
-        }
+            waveManager.draw();
 
-        if (waveManager.getMeteorsSpawned() < waveManager.getMeteorsPerWave() && meteoriteLag > METEORITE_SPAWN_LAG) {
-            meteoriteLag = 0;
-            waveManager.spawnMeteorite();
-        }
+            rect(0, (float)(SCREEN_HEIGHT * 0.9), SCREEN_WIDTH, (float)(SCREEN_HEIGHT * 0.1));
+            for (int i = 0; i < ballistas.length; i++) {
+                ballistas[i].draw(this, i == activeBallista);
+            }
 
-        if (!triggeredMissiles.isEmpty() && triggerLag >= TRIGGER_SEQUENCE_LAG) {
-            triggerLag = 0;
-            Missile activatedMissile = popFirst(triggeredMissiles);
-            exploding.put(activatedMissile.getId(), activatedMissile);
-        }
+            for (Infrastructure city : cities) {
+                city.draw(this);
+            }
 
-        LinkedList<Missile> collidingMissiles = new LinkedList<>();
-        for (Missile missile : activeMissiles.values()) {
-            if (missileInAir(missile)) {
+            for (Missile missile : exploded) {
+                missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles, waveManager);
+                explosionLag++;
+            }
+
+            if (!exploded.isEmpty() && explosionLag >= MAX_EXPLOSION_DURATION) {
+                if (exploded.getFirst() instanceof EnemyMissile) {
+                    waveManager.enemyKilled();
+                }
+                exploded.removeFirst();
+                explosionLag = 0;
+            }
+
+            if (waveManager.getMeteorsSpawned() < waveManager.getMeteorsPerWave() && meteoriteLag > METEORITE_SPAWN_LAG) {
+                meteoriteLag = 0;
+                waveManager.spawnMeteorite();
+            }
+
+            if (!triggeredMissiles.isEmpty() && triggerLag >= TRIGGER_SEQUENCE_LAG) {
+                triggerLag = 0;
+                Missile activatedMissile = popFirst(triggeredMissiles);
+                exploding.put(activatedMissile.getId(), activatedMissile);
+            }
+
+            LinkedList<Missile> collidingMissiles = new LinkedList<>();
+            for (Missile missile : activeMissiles.values()) {
+                if (missileInAir(missile)) {
+                    missile.draw(this);
+                    missile.integrate();
+                }
+                else {
+                    collidingMissiles.add(missile);
+                }
+            }
+
+            for (EnemyMissile enemyMissile : enemies.values()) {
+                boolean collision = false;
+                Missile collider = null;
+                for (Missile missile : activeMissiles.values()) {
+                    collision = enemyMissile.collisionCheck(missile);
+                    if (collision) {
+                        collider = missile;
+                        waveManager.addScore(enemyMissile.getScore());
+                        break;
+                    }
+                }
+
+                if (missileInAir(enemyMissile) && !collision) {
+                    enemyMissile.draw(this);
+                    enemyMissile.integrate();
+                }
+                else {
+                    if (collider != null){
+                        collidingMissiles.add(collider);
+                    }
+                    collidingMissiles.add(enemyMissile);
+                }
+            }
+
+            for (Missile missile : triggeredMissiles.values()) {
                 missile.draw(this);
                 missile.integrate();
             }
-            else {
-                collidingMissiles.add(missile);
-            }
-        }
 
-        for (EnemyMissile enemyMissile : enemies.values()) {
-            boolean collision = false;
-            Missile collider = null;
-            for (Missile missile : activeMissiles.values()) {
-                collision = enemyMissile.collisionCheck(missile);
-                if (collision) {
-                    collider = missile;
-                    waveManager.addScore(enemyMissile.getScore());
-                    break;
-                }
-            }
-
-            if (missileInAir(enemyMissile) && !collision) {
-                enemyMissile.draw(this);
-                enemyMissile.integrate();
-            }
-            else {
-                if (collider != null){
-                    collidingMissiles.add(collider);
-                }
-                collidingMissiles.add(enemyMissile);
-            }
-        }
-
-        for (Missile missile : triggeredMissiles.values()) {
-            missile.draw(this);
-            missile.integrate();
-        }
-
-        for (Missile surfaceMissile : collidingMissiles) {
-            if (surfaceMissile instanceof EnemyMissile) {
-                enemies.remove(surfaceMissile.getId());
-            }
-            else {
-                activeMissiles.remove(surfaceMissile.getId());
-            }
-            exploding.put(surfaceMissile.getId(), surfaceMissile);
-        }
-
-        if (!exploding.isEmpty()) {
-            LinkedList<Missile> toExplode = new LinkedList<>();
-
-            for (Missile missile : exploding.values()) {
-                toExplode =  missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles,
-                        waveManager);
-                if (missile.getExplosionState() == 1) {
-                    exploded.add(missile);
-                }
-            }
-            for (Missile missile : exploded) {
-                exploding.remove(missile.getId());
-            }
-            while (!toExplode.isEmpty()) {
-                Missile missile = toExplode.removeFirst();
-                exploding.put(missile.getId(), missile);
-                if (activeMissiles.containsKey(missile.getId())) {
-                    activeMissiles.remove(missile.getId());
+            for (Missile surfaceMissile : collidingMissiles) {
+                if (surfaceMissile instanceof EnemyMissile) {
+                    enemies.remove(surfaceMissile.getId());
                 }
                 else {
-                    enemies.remove(missile.getId());
+                    activeMissiles.remove(surfaceMissile.getId());
+                }
+                exploding.put(surfaceMissile.getId(), surfaceMissile);
+            }
+
+            if (!exploding.isEmpty()) {
+                LinkedList<Missile> toExplode = new LinkedList<>();
+
+                for (Missile missile : exploding.values()) {
+                    toExplode =  missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles,
+                            waveManager);
+                    if (missile.getExplosionState() == 1) {
+                        exploded.add(missile);
+                    }
+                }
+                for (Missile missile : exploded) {
+                    exploding.remove(missile.getId());
+                }
+                while (!toExplode.isEmpty()) {
+                    Missile missile = toExplode.removeFirst();
+                    exploding.put(missile.getId(), missile);
+                    if (activeMissiles.containsKey(missile.getId())) {
+                        activeMissiles.remove(missile.getId());
+                    }
+                    else {
+                        enemies.remove(missile.getId());
+                    }
                 }
             }
+
+            triggerLag++;
+            meteoriteLag++;
+            forceRegistry.updateForces() ;
         }
-
-        triggerLag++;
-        meteoriteLag++;
-        forceRegistry.updateForces() ;
-
     }
 
     // When mouse is released create new vector relative to stored x, y coords

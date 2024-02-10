@@ -19,6 +19,7 @@ public class WaveManager {
     LinkedHashMap<Integer, EnemyMissile> enemies;
     final int FIB_INIT = 2;
     int consumedPoints;
+    boolean gameOver;
 
     WaveManager(PApplet sketch, int SCREEN_HEIGHT, int SCREEN_WIDTH, Ballista[] ballistas, Infrastructure[] cities,
                 float INVERTED_METEORITE_MASS, int METEORITE_SCORE, int METEORITE_EXPLOSION_RADIUS,
@@ -47,6 +48,7 @@ public class WaveManager {
         this.score = 0;
         this.consumedPoints = 0;
         this.CITY_REVIVAL_THRESHOLD = CITY_REVIVAL_THRESHOLD;
+        this.gameOver = false;
     }
 
     // https://r-knott.surrey.ac.uk/Fibonacci/fibFormula.html [09/02/2024]
@@ -116,6 +118,14 @@ public class WaveManager {
                 }
             }
         }
+
+        int dead = 0;
+        for (Infrastructure city : cities) {
+            if (!city.isAlive()) {
+                dead++;
+            }
+        }
+        gameOver = dead == cities.length;
     }
 
     public int getMeteorsPerWave() {
@@ -145,16 +155,6 @@ public class WaveManager {
         this.score += score * getScoreMultiplier();
     }
 
-    public boolean gameOver() {
-        int dead = 0;
-        for (Infrastructure city : cities) {
-            if (!city.isAlive()) {
-                dead++;
-            }
-        }
-        return dead == cities.length;
-    }
-
     private int getScoreMultiplier() {
         int scoreMultiplier = 1;
         switch (this.wave) {
@@ -181,5 +181,9 @@ public class WaveManager {
                 scoreMultiplier = 6;
         }
         return scoreMultiplier;
+    }
+
+    public boolean isGameOver() {
+        return this.gameOver;
     }
 }
