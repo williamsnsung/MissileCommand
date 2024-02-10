@@ -7,7 +7,7 @@ import java.util.LinkedHashMap;
 public class WaveManager {
     int wave, meteorsPerWave, meteorsSpawned, enemiesAlive, score;
     final int SCREEN_WIDTH, SCREEN_HEIGHT, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
-    METEORITE_RADII;
+    METEORITE_RADII, CITY_REVIVAL_THRESHOLD;
     final float INVERTED_METEORITE_MASS;
     Ballista[] ballistas;
     Infrastructure[] cities;
@@ -18,12 +18,13 @@ public class WaveManager {
     Drag drag;
     LinkedHashMap<Integer, EnemyMissile> enemies;
     final int FIB_INIT = 2;
+    int consumedPoints;
 
     WaveManager(PApplet sketch, int SCREEN_HEIGHT, int SCREEN_WIDTH, Ballista[] ballistas, Infrastructure[] cities,
                 float INVERTED_METEORITE_MASS, int METEORITE_SCORE, int METEORITE_EXPLOSION_RADIUS,
                 int METEORITE_EXPLOSION_STATES, float INITIAL_METEORITE_VELOCITY,
                 ForceRegistry forceRegistry, Gravity gravity, Drag drag, LinkedHashMap<Integer, EnemyMissile> enemies,
-                int METEORITE_RADII) {
+                int METEORITE_RADII, int CITY_REVIVAL_THRESHOLD) {
         this.sketch = sketch;
         this.SCREEN_WIDTH = SCREEN_WIDTH;
         this.SCREEN_HEIGHT = SCREEN_HEIGHT;
@@ -44,6 +45,8 @@ public class WaveManager {
         this.drag = drag;
         this.enemies = enemies;
         this.score = 0;
+        this.consumedPoints = 0;
+        this.CITY_REVIVAL_THRESHOLD = CITY_REVIVAL_THRESHOLD;
     }
 
     // https://r-knott.surrey.ac.uk/Fibonacci/fibFormula.html [09/02/2024]
@@ -87,7 +90,7 @@ public class WaveManager {
     public void newWave() {
         this.wave++;
         this.meteorsPerWave = fib(wave);
-        this.meteoriteVelocity = fib(wave);
+        this.meteoriteVelocity = wave;
         this.meteorsSpawned = 0;
         this.enemiesAlive = 0;
         int curScore = 0;
@@ -103,6 +106,16 @@ public class WaveManager {
             ballista.restockMissiles();
         }
         this.score += curScore * getScoreMultiplier();
+
+        if (this.score - this.consumedPoints > CITY_REVIVAL_THRESHOLD) {
+            for (Infrastructure city : cities) {
+                if (!city.isAlive()) {
+                    city.revive();
+                    this.consumedPoints += CITY_REVIVAL_THRESHOLD;
+                    break;
+                }
+            }
+        }
     }
 
     public int getMeteorsPerWave() {

@@ -31,6 +31,7 @@ public class MissileCommand extends PApplet{
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
     final int METEORITE_SCORE = 25;
+    final int CITY_REVIVAL_THRESHOLD = 10000;
     int triggerLag, explosionLag, meteoriteLag;
     ForceRegistry forceRegistry ;
     int activeBallista;
@@ -117,7 +118,8 @@ public class MissileCommand extends PApplet{
         meteoriteLag = 10000000;
         waveManager = new WaveManager(this, SCREEN_HEIGHT, SCREEN_WIDTH, ballistas, cities,
                 INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
-                INITIAL_METEORITE_VELOCITY, forceRegistry, gravity, drag, enemies, METEORITE_RADII);
+                INITIAL_METEORITE_VELOCITY, forceRegistry, gravity, drag, enemies, METEORITE_RADII,
+                CITY_REVIVAL_THRESHOLD);
     }
 
     public void draw(){
