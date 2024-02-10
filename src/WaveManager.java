@@ -8,7 +8,7 @@ public class WaveManager {
     int wave, meteorsPerWave, meteorsSpawned, enemiesAlive, score;
     final int SCREEN_WIDTH, SCREEN_HEIGHT, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
     METEORITE_RADII, CITY_REVIVAL_THRESHOLD;
-    final float INVERTED_METEORITE_MASS;
+    final float INVERTED_METEORITE_MASS, SPLIT_PROBABILITY;
     Ballista[] ballistas;
     Infrastructure[] cities;
     PApplet sketch;
@@ -25,7 +25,7 @@ public class WaveManager {
                 float INVERTED_METEORITE_MASS, int METEORITE_SCORE, int METEORITE_EXPLOSION_RADIUS,
                 int METEORITE_EXPLOSION_STATES, float INITIAL_METEORITE_VELOCITY,
                 ForceRegistry forceRegistry, Gravity gravity, Drag drag, LinkedHashMap<Integer, EnemyMissile> enemies,
-                int METEORITE_RADII, int CITY_REVIVAL_THRESHOLD) {
+                int METEORITE_RADII, int CITY_REVIVAL_THRESHOLD, float SPLIT_PROBABILITY) {
         this.sketch = sketch;
         this.SCREEN_WIDTH = SCREEN_WIDTH;
         this.SCREEN_HEIGHT = SCREEN_HEIGHT;
@@ -49,6 +49,7 @@ public class WaveManager {
         this.consumedPoints = 0;
         this.CITY_REVIVAL_THRESHOLD = CITY_REVIVAL_THRESHOLD;
         this.gameOver = false;
+        this.SPLIT_PROBABILITY = SPLIT_PROBABILITY;
     }
 
     // https://r-knott.surrey.ac.uk/Fibonacci/fibFormula.html [09/02/2024]
@@ -67,6 +68,10 @@ public class WaveManager {
     public void spawnMeteorite() {
         float x = sketch.random(SCREEN_WIDTH);
         float y = (float) (SCREEN_HEIGHT * 0.1);
+        spawnMeteorite(METEORITE_RADII, x, y, SPLIT_PROBABILITY);
+    }
+
+    public void spawnMeteorite(int radius, float x, float y, float splitProbability) {
         PVector pos = new PVector(x, y);
         PVector velocity;
         int target = (int) sketch.random(ballistas.length + cities.length);
@@ -82,8 +87,7 @@ public class WaveManager {
         this.enemiesAlive++;
         EnemyMissile enemyMissile = new EnemyMissile(x, y, velocity.x, velocity.y,
                 INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
-                METEORITE_RADII
-                );
+                radius, splitProbability);
         enemies.put(enemyMissile.getId(), enemyMissile);
         forceRegistry.add(enemyMissile, gravity);
         forceRegistry.add(enemyMissile, drag);
@@ -185,5 +189,9 @@ public class WaveManager {
 
     public boolean isGameOver() {
         return this.gameOver;
+    }
+
+    public int getWave() {
+        return this.wave;
     }
 }

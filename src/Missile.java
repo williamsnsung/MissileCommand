@@ -6,14 +6,14 @@ import java.util.LinkedList;
 public class Missile extends GameObject{
     private final int explosionRadius;
     private int explosionState;
-    private final int RADIUS;
+    private int radius;
 
     Missile(float x, float y, float xVel, float yVel, float invM, int explosionRadius, int explosionState,
             int MISSILE_RADIUS) {
         super(x, y, xVel, yVel, invM);
         this.explosionRadius = explosionRadius;
         this.explosionState = explosionState;
-        this.RADIUS = MISSILE_RADIUS;
+        this.radius = MISSILE_RADIUS;
     }
 
     public LinkedList<Missile> explode(PApplet sketch, Ballista[] ballistas, Infrastructure[] cities,
@@ -64,7 +64,7 @@ public class Missile extends GameObject{
     }
 
     public void draw(PApplet sketch) {
-        sketch.circle(this.position.x, this.position.y, this.RADIUS);
+        sketch.circle(this.position.x, this.position.y, this.radius);
     }
 
     public int getExplosionState() {
@@ -72,7 +72,10 @@ public class Missile extends GameObject{
     }
 
     public int getRadius() {
-        return this.RADIUS;
+        return this.radius;
     }
 
+    public void setRadius(int radius) {
+        this.radius = radius;
+    }
 }

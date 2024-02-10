@@ -29,6 +29,7 @@ public class MissileCommand extends PApplet{
     final int TRIGGER_SEQUENCE_LAG = 10;
     final int METEORITE_SPAWN_LAG = 75;
     final int MAX_EXPLOSION_DURATION = 20;
+    final float SPLIT_PROBABILITY = 0.1f;
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
     final int METEORITE_SCORE = 25;
@@ -120,7 +121,7 @@ public class MissileCommand extends PApplet{
         waveManager = new WaveManager(this, SCREEN_HEIGHT, SCREEN_WIDTH, ballistas, cities,
                 INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
                 INITIAL_METEORITE_VELOCITY, forceRegistry, gravity, drag, enemies, METEORITE_RADII,
-                CITY_REVIVAL_THRESHOLD);
+                CITY_REVIVAL_THRESHOLD, SPLIT_PROBABILITY);
     }
 
     public void draw(){
@@ -134,7 +135,7 @@ public class MissileCommand extends PApplet{
         }
         else {
             cursor(CROSS);
-            if (waveManager.getMeteorsPerWave() == waveManager.getMeteorsSpawned() && waveManager.getEnemiesAlive() == 0) {
+            if (waveManager.getMeteorsPerWave() <= waveManager.getMeteorsSpawned() && waveManager.getEnemiesAlive() == 0) {
                 waveManager.newWave();
             }
             waveManager.draw();
@@ -185,6 +186,7 @@ public class MissileCommand extends PApplet{
 
             for (EnemyMissile enemyMissile : enemies.values()) {
                 boolean collision = false;
+                boolean split = false;
                 Missile collider = null;
                 for (Missile missile : activeMissiles.values()) {
                     collision = enemyMissile.collisionCheck(missile);
@@ -195,11 +197,14 @@ public class MissileCommand extends PApplet{
                     }
                 }
 
+                if (waveManager.getWave() != 1) {
+                    split = enemyMissile.split(this, waveManager);
+                }
                 if (missileInAir(enemyMissile) && !collision) {
                     enemyMissile.draw(this);
                     enemyMissile.integrate();
                 }
-                else {
+                else if (!split){
                     if (collider != null){
                         collidingMissiles.add(collider);
                     }

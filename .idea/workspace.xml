@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a06ee47c-f8e3-433d-986a-1c40ea6e7acb" name="Changes" comment="City revival implemented.">
+    <list default="true" id="a06ee47c-f8e3-433d-986a-1c40ea6e7acb" name="Changes" comment="Game over detection working, takes into account revival.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/EnemyMissile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/EnemyMissile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Missile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Missile.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MissileCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MissileCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WaveManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WaveManager.java" afterDir="false" />
     </list>
@@ -224,7 +226,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707586860325</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Game over detection working, takes into account revival.">
+      <option name="closed" value="true" />
+      <created>1707587597460</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1707587597460</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -245,7 +255,8 @@
     <MESSAGE value="Meteorite scoring working and score is displayed." />
     <MESSAGE value="Score multiplier implemented, added scores for missiles and alive cities." />
     <MESSAGE value="City revival implemented." />
-    <option name="LAST_COMMIT_MESSAGE" value="City revival implemented." />
+    <MESSAGE value="Game over detection working, takes into account revival." />
+    <option name="LAST_COMMIT_MESSAGE" value="Game over detection working, takes into account revival." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
