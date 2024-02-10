@@ -20,7 +20,7 @@ class GameObject {
     }
 
     public PVector getPosition() {
-        return this.position;
+        return this.position.copy();
     }
 
     public int getId() {

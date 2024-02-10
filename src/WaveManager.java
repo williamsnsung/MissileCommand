@@ -65,21 +65,21 @@ public class WaveManager {
         PVector velocity;
         int target = (int) sketch.random(ballistas.length + cities.length);
         if (target < cities.length) {
-            velocity = pos.sub(cities[target].getPosition());
+//            velocity = pos.add(cities[target].getPosition());
+            velocity = cities[target].getPosition().sub(pos);
         }
         else {
-            velocity = pos.sub(ballistas[target % cities.length].getPosition());
+//            velocity = pos.add(ballistas[target % cities.length].getPosition());
+            velocity = ballistas[target % cities.length].getPosition().sub(pos);
         }
         velocity.normalize();
-//        velocity.mult(newMissileVelocity());
+        velocity.mult(newMissileVelocity());
         this.meteorsSpawned++;
         this.enemiesAlive++;
         EnemyMissile enemyMissile = new EnemyMissile(x, y, velocity.x, velocity.y,
                 INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
                 METEORITE_RADII
                 );
-//        EnemyMissile enemyMissile = new EnemyMissile(x, y, 0, 0,
-//                INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES);
         enemies.put(enemyMissile.getId(), enemyMissile);
         forceRegistry.add(enemyMissile, gravity);
         forceRegistry.add(enemyMissile, drag);
@@ -88,6 +88,7 @@ public class WaveManager {
     public void newWave() {
         this.wave++;
         this.meteorsPerWave = fib(wave + 2);
+        this.meteoriteVelocity += fib(wave + 2);
         this.meteorsSpawned = 0;
         this.enemiesAlive = 0;
         for (Ballista ballista : ballistas) {
