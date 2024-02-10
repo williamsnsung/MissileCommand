@@ -58,6 +58,10 @@ public class Missile extends GameObject{
         return toExplode;
     }
 
+    public boolean collisionCheck(GameObject toCheck) {
+        return this.position.dist(toCheck.getPosition()) < this.getRadius();
+    }
+
     public void draw(PApplet sketch) {
         sketch.circle(this.position.x, this.position.y, this.RADIUS);
     }

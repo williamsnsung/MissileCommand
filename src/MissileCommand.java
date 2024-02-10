@@ -171,23 +171,36 @@ public class MissileCommand extends PApplet{
             exploding.put(activatedMissile.getId(), activatedMissile);
         }
 
-        LinkedList<Missile> surfaceMissiles = new LinkedList<>();
+        LinkedList<Missile> collidingMissiles = new LinkedList<>();
         for (Missile missile : activeMissiles.values()) {
             if (!missileOnSurface(missile)) {
                 missile.draw(this);
                 missile.integrate();
             }
             else {
-                surfaceMissiles.add(missile);
+                collidingMissiles.add(missile);
             }
         }
         for (EnemyMissile enemyMissile : enemies.values()) {
-            if (!missileOnSurface(enemyMissile)) {
+            boolean collision = false;
+            Missile collider = null;
+            for (Missile missile : activeMissiles.values()) {
+                collision = enemyMissile.collisionCheck(missile);
+                if (collision) {
+                    collider = missile;
+                    break;
+                }
+            }
+
+            if (!missileOnSurface(enemyMissile) && !collision) {
                 enemyMissile.draw(this);
                 enemyMissile.integrate();
             }
             else {
-                surfaceMissiles.add(enemyMissile);
+                if (collider != null){
+                    collidingMissiles.add(collider);
+                }
+                collidingMissiles.add(enemyMissile);
             }
         }
 
@@ -196,7 +209,7 @@ public class MissileCommand extends PApplet{
             missile.integrate();
         }
 
-        for (Missile surfaceMissile : surfaceMissiles) {
+        for (Missile surfaceMissile : collidingMissiles) {
             activeMissiles.remove(surfaceMissile.getId());
             exploding.put(surfaceMissile.getId(), surfaceMissile);
         }
