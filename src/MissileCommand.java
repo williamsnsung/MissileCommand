@@ -29,7 +29,7 @@ public class MissileCommand extends PApplet{
     final int TRIGGER_SEQUENCE_LAG = 10;
     final int METEORITE_SPAWN_LAG = 75;
     final int MAX_EXPLOSION_DURATION = 20;
-    final float SPLIT_PROBABILITY = 0.1f;
+    final float SPLIT_PROBABILITY = 0.01f;
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
     final int METEORITE_SCORE = 25;
@@ -164,7 +164,10 @@ public class MissileCommand extends PApplet{
 
             if (waveManager.getMeteorsSpawned() < waveManager.getMeteorsPerWave() && meteoriteLag > METEORITE_SPAWN_LAG) {
                 meteoriteLag = 0;
-                waveManager.spawnMeteorite();
+                EnemyMissile enemyMissile = waveManager.spawnMeteorite();
+                enemies.put(enemyMissile.getId(), enemyMissile);
+                forceRegistry.add(enemyMissile, gravity);
+                forceRegistry.add(enemyMissile, drag);
             }
 
             if (!triggeredMissiles.isEmpty() && triggerLag >= TRIGGER_SEQUENCE_LAG) {
@@ -184,6 +187,7 @@ public class MissileCommand extends PApplet{
                 }
             }
 
+            LinkedList<EnemyMissile> splitMissiles = new LinkedList<>();
             for (EnemyMissile enemyMissile : enemies.values()) {
                 boolean collision = false;
                 boolean split = false;
@@ -198,18 +202,29 @@ public class MissileCommand extends PApplet{
                 }
 
                 if (waveManager.getWave() != 1) {
-                    split = enemyMissile.split(this, waveManager);
+                    EnemyMissile splitMissile = enemyMissile.split(this, waveManager);
+                    if (splitMissile != null ) {
+                        splitMissiles.add(splitMissile);
+                    }
                 }
                 if (missileInAir(enemyMissile) && !collision) {
                     enemyMissile.draw(this);
                     enemyMissile.integrate();
                 }
-                else if (!split){
+                else {
                     if (collider != null){
                         collidingMissiles.add(collider);
                     }
                     collidingMissiles.add(enemyMissile);
                 }
+            }
+            while (!splitMissiles.isEmpty()) {
+                EnemyMissile enemyMissile = splitMissiles.removeFirst();
+                enemies.put(enemyMissile.getId(), enemyMissile);
+                forceRegistry.add(enemyMissile, gravity);
+                forceRegistry.add(enemyMissile, drag);
+                enemyMissile.draw(this);
+                enemyMissile.integrate();
             }
 
             for (Missile missile : triggeredMissiles.values()) {

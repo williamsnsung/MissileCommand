@@ -20,13 +20,15 @@ public class EnemyMissile extends Missile{
         return this.score;
     }
 
-    public boolean split(PApplet sketch, WaveManager waveManager) {
+    public EnemyMissile split(PApplet sketch, WaveManager waveManager) {
+        EnemyMissile enemyMissile = null;
         boolean meteorSplit = this.splitProbability > sketch.random(1);
-        if (this.splitProbability > sketch.random(1)) {
-            waveManager.spawnMeteorite((int) this.getRadius() / 2, this.position.x, this.position.y, 0);
+        if (meteorSplit) {
+            enemyMissile = waveManager.spawnMeteorite((int) this.getRadius() / 2,
+                    this.position.x, this.position.y, 0);
             this.splitProbability = 0;
             this.setRadius(this.getRadius() / 2);
         }
-        return meteorSplit;
+        return enemyMissile;
     }
 }

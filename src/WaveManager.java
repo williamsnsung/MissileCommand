@@ -65,13 +65,13 @@ public class WaveManager {
         return sketch.random(meteoriteVelocity * 0.9f, meteoriteVelocity * 1.1f);
     }
 
-    public void spawnMeteorite() {
+    public EnemyMissile spawnMeteorite() {
         float x = sketch.random(SCREEN_WIDTH);
         float y = (float) (SCREEN_HEIGHT * 0.1);
-        spawnMeteorite(METEORITE_RADII, x, y, SPLIT_PROBABILITY);
+        return spawnMeteorite(METEORITE_RADII, x, y, SPLIT_PROBABILITY);
     }
 
-    public void spawnMeteorite(int radius, float x, float y, float splitProbability) {
+    public EnemyMissile spawnMeteorite(int radius, float x, float y, float splitProbability) {
         PVector pos = new PVector(x, y);
         PVector velocity;
         int target = (int) sketch.random(ballistas.length + cities.length);
@@ -85,12 +85,13 @@ public class WaveManager {
         velocity.mult(newMissileVelocity());
         this.meteorsSpawned++;
         this.enemiesAlive++;
-        EnemyMissile enemyMissile = new EnemyMissile(x, y, velocity.x, velocity.y,
+
+        return new EnemyMissile(x, y, velocity.x, velocity.y,
                 INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
                 radius, splitProbability);
-        enemies.put(enemyMissile.getId(), enemyMissile);
-        forceRegistry.add(enemyMissile, gravity);
-        forceRegistry.add(enemyMissile, drag);
+//        enemies.put(enemyMissile.getId(), enemyMissile);
+//        forceRegistry.add(enemyMissile, gravity);
+//        forceRegistry.add(enemyMissile, drag);
     }
 
     public void newWave() {
