@@ -17,7 +17,7 @@ public class MissileCommand extends PApplet{
     final char TRIGGER = ' ';
     final int MISSILE_RADII = 10;
     final float MISSILE_VELOCITY = 28;
-    final float INITIAL_METEORITE_VELOCITY = 10;
+    final float INITIAL_METEORITE_VELOCITY = 1;
     final float INVERTED_MISSILE_MASS = 0.5f;
     final float INVERTED_METEORITE_MASS = 0.5f;
     final int EXPLOSION_RADIUS = 50;
@@ -137,10 +137,11 @@ public class MissileCommand extends PApplet{
         if (waveManager.getMeteorsPerWave() == waveManager.getMeteorsSpawned() && waveManager.getEnemiesAlive() == 0) {
             waveManager.newWave();
         }
+        waveManager.draw();
 
         rect(0, (float)(SCREEN_HEIGHT * 0.9), SCREEN_WIDTH, (float)(SCREEN_HEIGHT * 0.1));
-        for (Ballista ballista : ballistas) {
-            ballista.draw(this);
+        for (int i = 0; i < ballistas.length; i++) {
+            ballistas[i].draw(this, i == activeBallista);
         }
 
         for (Infrastructure city : cities) {

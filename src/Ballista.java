@@ -21,8 +21,21 @@ public class Ballista extends Infrastructure{
         return this.missiles;
     }
 
-    public void draw(PApplet sketch) {
-        sketch.circle(this.position.x, this.position.y, this.getRadius());
+    public void draw(PApplet sketch, boolean active) {
+        if (this.missiles == 0) {
+            sketch.fill(128,128,128);
+            sketch.circle(this.position.x, this.position.y, this.getRadius());
+            sketch.fill(255,255,255);
+        }
+        else if (active) {
+            sketch.fill(0,255,0);
+            sketch.circle(this.position.x, this.position.y, this.getRadius());
+            sketch.fill(255,255,255);
+        }
+        else {
+            sketch.circle(this.position.x, this.position.y, this.getRadius());
+        }
+
         PFont font = sketch.createFont("Arial",16,true);
         sketch.textFont(font,16);
         sketch.fill(0,0,0);

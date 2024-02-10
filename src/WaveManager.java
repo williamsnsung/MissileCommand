@@ -1,4 +1,5 @@
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PVector;
 
 import java.util.LinkedHashMap;
@@ -19,6 +20,7 @@ public class WaveManager {
     Gravity gravity;
     Drag drag;
     LinkedHashMap<Integer, EnemyMissile> enemies;
+    final int FIB_INIT = 2;
 
     WaveManager(PApplet sketch, int SCREEN_HEIGHT, int SCREEN_WIDTH, Ballista[] ballistas, Infrastructure[] cities,
                 float INVERTED_METEORITE_MASS, int METEORITE_SCORE, int METEORITE_EXPLOSION_RADIUS,
@@ -37,7 +39,7 @@ public class WaveManager {
         this.ballistas = ballistas;
         this.cities = cities;
         this.wave = 1;
-        this.meteorsPerWave = fib(wave + 2);
+        this.meteorsPerWave = fib(wave);
         this.meteorsSpawned = 0;
         this.enemiesAlive = 0;
         this.forceRegistry = forceRegistry;
@@ -48,6 +50,7 @@ public class WaveManager {
 
     // https://r-knott.surrey.ac.uk/Fibonacci/fibFormula.html [09/02/2024]
     public int fib(int n) {
+        n += FIB_INIT;
         double phi = 1.6180339887;
         double sqrt5 = 2.2360679775;
         double res = (Math.pow(phi, n) - Math.pow(-phi, -n))/sqrt5;
@@ -55,7 +58,7 @@ public class WaveManager {
     }
 
     public float newMissileVelocity() {
-        return sketch.random(meteoriteVelocity, meteoriteVelocity * 2);
+        return sketch.random(meteoriteVelocity, meteoriteVelocity + fib(wave));
     }
 
     public void spawnMeteorite() {
@@ -87,8 +90,8 @@ public class WaveManager {
 
     public void newWave() {
         this.wave++;
-        this.meteorsPerWave = fib(wave + 2);
-        this.meteoriteVelocity += fib(wave + 2);
+        this.meteorsPerWave = fib(wave);
+        this.meteoriteVelocity += fib(wave);
         this.meteorsSpawned = 0;
         this.enemiesAlive = 0;
         for (Ballista ballista : ballistas) {
@@ -110,5 +113,11 @@ public class WaveManager {
 
     public void enemyKilled() {
         this.enemiesAlive--;
+    }
+
+    public void draw() {
+        PFont font = sketch.createFont("Arial",16,true);
+        sketch.textFont(font,16);
+        sketch.text("WAVE: " + wave, 5, 20);
     }
 }
