@@ -31,7 +31,9 @@ public class MissileCommand extends PApplet{
     final int MAX_EXPLOSION_DURATION = 20;
     final float SPLIT_PROBABILITY = 0.01f;
     final float BOMBER_PROBABILITY = 0.001f;
+    final float SMART_BOMB_DISPLACEMENT_FORCE = 5f;
     final float BOMBER_DROP_PROBABILITY = 0.01f;
+    final float SMART_BOMB_PROBABILITY = 0.001f;
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
     final int METEORITE_SCORE = 25;
@@ -215,15 +217,17 @@ public class MissileCommand extends PApplet{
                         break;
                     }
                 }
-                if (enemyMissile.getPosition().x > SCREEN_WIDTH) {
-                    offScreenEnemies.add(enemyMissile);
-                }
 
                 if (enemyMissile.getType() == 1) {
                     EnemyMissile bomb = enemyMissile.dropBomb(this, waveManager, METEORITE_RADII, BOMBER_DROP_PROBABILITY);
                     if (bomb != null) {
                         newMissiles.add(bomb);
                     }
+                    if (enemyMissile.getPosition().x > SCREEN_WIDTH) {
+                        offScreenEnemies.add(enemyMissile);
+                    }
+                } else if (enemyMissile.getType() == 2) {
+                    enemyMissile.detectExplosions(exploding, SMART_BOMB_DISPLACEMENT_FORCE);
                 }
 
                 if (waveManager.getWave() != 1) {
@@ -247,6 +251,15 @@ public class MissileCommand extends PApplet{
                 EnemyMissile bomber = waveManager.spawnBomber(25, BOMBER_PROBABILITY);
                 if (bomber != null ) {
                     enemies.put(bomber.getId(), bomber);
+                }
+
+                if (waveManager.getWave() >= 6) {
+                    EnemyMissile smartBomb = waveManager.spawnSmartBomb(SMART_BOMB_PROBABILITY);
+                    if (smartBomb != null ) {
+                        enemies.put(smartBomb.getId(), smartBomb);
+                        forceRegistry.add(smartBomb, gravity);
+                        forceRegistry.add(smartBomb, drag);
+                    }
                 }
             }
             for (EnemyMissile offScreenEnemy : offScreenEnemies) {

@@ -1,9 +1,12 @@
 import processing.core.PApplet;
+import processing.core.PVector;
+
+import java.util.LinkedHashMap;
 
 public class EnemyMissile extends Missile{
     private final int score;
     private float splitProbability;
-    private int type;
+    private final int type;
 
     EnemyMissile(float x, float y, float xVel, float yVel, float invM, int score, int explosionRadius,
                  int explosionState, int METEOR_RADIUS, float splitProbability, int type) {
@@ -22,6 +25,8 @@ public class EnemyMissile extends Missile{
             case 1:
                 sketch.fill(255, 0, 255);
                 break;
+            case 2:
+                sketch.fill(255, 255, 0);
         }
         sketch.circle(this.position.x, this.position.y, this.getRadius());
         sketch.fill(255, 255, 255);
@@ -36,7 +41,7 @@ public class EnemyMissile extends Missile{
         boolean meteorSplit = this.splitProbability > sketch.random(1);
         if (meteorSplit) {
             enemyMissile = waveManager.spawnMeteorite((int) this.getRadius() / 2,
-                    this.position.x, this.position.y, 0);
+                    this.position.x, this.position.y, 0, 0);
             this.splitProbability = 0;
             this.setRadius(this.getRadius() / 2);
         }
@@ -48,12 +53,25 @@ public class EnemyMissile extends Missile{
         boolean drop = bombProbability > sketch.random(1);
         if (drop) {
             enemyMissile = waveManager.spawnMeteorite(radius,
-                    this.position.x, this.position.y, splitProbability);
+                    this.position.x, this.position.y, splitProbability, 0);
         }
         return enemyMissile;
     }
 
     public int getType() {
         return this.type;
+    }
+    public void detectExplosions(LinkedHashMap<Integer, Missile> exploding, float force) {
+        for (Missile missile : exploding.values()) {
+            if (this.position.dist(missile.getPosition()) < 100) {
+                PVector velocity = missile.getPosition().sub(this.position);
+                velocity.x = -velocity.x;
+                velocity.y = -velocity.y;
+                velocity.normalize();
+                velocity.mult(force);
+                this.velocity = velocity;
+                return;
+            }
+        }
     }
 }

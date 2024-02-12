@@ -68,10 +68,21 @@ public class WaveManager {
     public EnemyMissile spawnMeteorite() {
         float x = sketch.random(SCREEN_WIDTH);
         float y = (float) (SCREEN_HEIGHT * 0.1);
-        return spawnMeteorite(METEORITE_RADII, x, y, SPLIT_PROBABILITY);
+        return spawnMeteorite(METEORITE_RADII, x, y, SPLIT_PROBABILITY, 0);
     }
 
-    public EnemyMissile spawnMeteorite(int radius, float x, float y, float splitProbability) {
+    public EnemyMissile spawnSmartBomb(float spawnProbability) {
+        EnemyMissile enemyMissile = null;
+        boolean drop = spawnProbability > sketch.random(1);
+        if (drop) {
+            float x = sketch.random(SCREEN_WIDTH);
+            float y = (float) (SCREEN_HEIGHT * 0.1);
+            enemyMissile = spawnMeteorite(METEORITE_RADII, x, y, 0, 2);
+        }
+        return enemyMissile;
+    }
+
+    public EnemyMissile spawnMeteorite(int radius, float x, float y, float splitProbability, int type) {
         PVector pos = new PVector(x, y);
         PVector velocity;
         int target = (int) sketch.random(ballistas.length + cities.length);
@@ -88,7 +99,7 @@ public class WaveManager {
 
         return new EnemyMissile(x, y, velocity.x, velocity.y,
                 INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
-                radius, splitProbability, 0);
+                radius, splitProbability, type);
     }
 
     public EnemyMissile spawnBomber(int radius, float spawnProbability) {
@@ -96,7 +107,7 @@ public class WaveManager {
         boolean spawn = spawnProbability > sketch.random(1);
         if (spawn) {
             float x = 0;
-            float y = sketch.random((float) (SCREEN_HEIGHT * 0.2), (float) SCREEN_HEIGHT / 2);
+            float y = sketch.random((float) (SCREEN_HEIGHT * 0.2), (float) SCREEN_HEIGHT / 3);
 
             enemyMissile = new EnemyMissile(x, y, 3, 0,
                     INVERTED_METEORITE_MASS, 100, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
@@ -107,8 +118,9 @@ public class WaveManager {
 
     public void newWave() {
         this.wave++;
-        this.meteorsPerWave = fib(wave);
+//        this.meteorsPerWave = fib(wave);
         this.meteoriteVelocity = wave;
+        this.meteorsPerWave = wave;
         this.meteorsSpawned = 0;
         this.enemiesAlive = 0;
         int curScore = 0;
