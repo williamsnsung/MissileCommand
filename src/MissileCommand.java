@@ -30,6 +30,8 @@ public class MissileCommand extends PApplet{
     final int METEORITE_SPAWN_LAG = 75;
     final int MAX_EXPLOSION_DURATION = 20;
     final float SPLIT_PROBABILITY = 0.01f;
+    final float BOMBER_PROBABILITY = 0.001f;
+    final float BOMBER_DROP_PROBABILITY = 0.01f;
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
     final int METEORITE_SCORE = 25;
@@ -88,6 +90,19 @@ public class MissileCommand extends PApplet{
         return !(missile.position.y > (float) (SCREEN_HEIGHT * 0.9));
     }
 
+    public void integrateExplosions(LinkedList<Missile> toExplode) {
+        while (!toExplode.isEmpty()) {
+            Missile missile = toExplode.removeFirst();
+            exploding.put(missile.getId(), missile);
+            if (activeMissiles.containsKey(missile.getId())) {
+                activeMissiles.remove(missile.getId());
+            }
+            else {
+                enemies.remove(missile.getId());
+            }
+        }
+    }
+
     public void settings() {
         size(SCREEN_WIDTH, SCREEN_HEIGHT) ;
         //Create a gravitational force
@@ -127,15 +142,14 @@ public class MissileCommand extends PApplet{
     public void draw(){
 
         background(0);
-
+        cursor(CROSS);
         if (waveManager.isGameOver()) {
             PFont font = createFont("Arial",16,true);
             textFont(font,24);
             text("GAME OVER", 175, 250);
         }
         else {
-            cursor(CROSS);
-            if (waveManager.getMeteorsPerWave() <= waveManager.getMeteorsSpawned() && waveManager.getEnemiesAlive() == 0) {
+            if (waveManager.getMeteorsPerWave() <= waveManager.getMeteorsSpawned() && waveManager.getEnemiesAlive() <= 0) {
                 waveManager.newWave();
             }
             waveManager.draw();
@@ -150,7 +164,8 @@ public class MissileCommand extends PApplet{
             }
 
             for (Missile missile : exploded) {
-                missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles, waveManager);
+                LinkedList<Missile> toExplode = missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles, waveManager);
+                integrateExplosions(toExplode);
                 explosionLag++;
             }
 
@@ -187,10 +202,10 @@ public class MissileCommand extends PApplet{
                 }
             }
 
-            LinkedList<EnemyMissile> splitMissiles = new LinkedList<>();
+            LinkedList<EnemyMissile> newMissiles = new LinkedList<>();
+            LinkedList<EnemyMissile> offScreenEnemies = new LinkedList<>();
             for (EnemyMissile enemyMissile : enemies.values()) {
                 boolean collision = false;
-                boolean split = false;
                 Missile collider = null;
                 for (Missile missile : activeMissiles.values()) {
                     collision = enemyMissile.collisionCheck(missile);
@@ -200,11 +215,21 @@ public class MissileCommand extends PApplet{
                         break;
                     }
                 }
+                if (enemyMissile.getPosition().x > SCREEN_WIDTH) {
+                    offScreenEnemies.add(enemyMissile);
+                }
+
+                if (enemyMissile.getType() == 1) {
+                    EnemyMissile bomb = enemyMissile.dropBomb(this, waveManager, METEORITE_RADII, BOMBER_DROP_PROBABILITY);
+                    if (bomb != null) {
+                        newMissiles.add(bomb);
+                    }
+                }
 
                 if (waveManager.getWave() != 1) {
                     EnemyMissile splitMissile = enemyMissile.split(this, waveManager);
                     if (splitMissile != null ) {
-                        splitMissiles.add(splitMissile);
+                        newMissiles.add(splitMissile);
                     }
                 }
                 if (missileInAir(enemyMissile) && !collision) {
@@ -218,8 +243,18 @@ public class MissileCommand extends PApplet{
                     collidingMissiles.add(enemyMissile);
                 }
             }
-            while (!splitMissiles.isEmpty()) {
-                EnemyMissile enemyMissile = splitMissiles.removeFirst();
+            if (waveManager.getWave() != 1) {
+                EnemyMissile bomber = waveManager.spawnBomber(25, BOMBER_PROBABILITY);
+                if (bomber != null ) {
+                    enemies.put(bomber.getId(), bomber);
+                }
+            }
+            for (EnemyMissile offScreenEnemy : offScreenEnemies) {
+                enemies.remove(offScreenEnemy.getId());
+            }
+
+            while (!newMissiles.isEmpty()) {
+                EnemyMissile enemyMissile = newMissiles.removeFirst();
                 enemies.put(enemyMissile.getId(), enemyMissile);
                 forceRegistry.add(enemyMissile, gravity);
                 forceRegistry.add(enemyMissile, drag);
@@ -255,16 +290,7 @@ public class MissileCommand extends PApplet{
                 for (Missile missile : exploded) {
                     exploding.remove(missile.getId());
                 }
-                while (!toExplode.isEmpty()) {
-                    Missile missile = toExplode.removeFirst();
-                    exploding.put(missile.getId(), missile);
-                    if (activeMissiles.containsKey(missile.getId())) {
-                        activeMissiles.remove(missile.getId());
-                    }
-                    else {
-                        enemies.remove(missile.getId());
-                    }
-                }
+                integrateExplosions(toExplode);
             }
 
             triggerLag++;

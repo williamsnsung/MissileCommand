@@ -88,10 +88,21 @@ public class WaveManager {
 
         return new EnemyMissile(x, y, velocity.x, velocity.y,
                 INVERTED_METEORITE_MASS, METEORITE_SCORE, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
-                radius, splitProbability);
-//        enemies.put(enemyMissile.getId(), enemyMissile);
-//        forceRegistry.add(enemyMissile, gravity);
-//        forceRegistry.add(enemyMissile, drag);
+                radius, splitProbability, 0);
+    }
+
+    public EnemyMissile spawnBomber(int radius, float spawnProbability) {
+        EnemyMissile enemyMissile = null;
+        boolean spawn = spawnProbability > sketch.random(1);
+        if (spawn) {
+            float x = 0;
+            float y = sketch.random((float) (SCREEN_HEIGHT * 0.2), (float) SCREEN_HEIGHT / 2);
+
+            enemyMissile = new EnemyMissile(x, y, 3, 0,
+                    INVERTED_METEORITE_MASS, 100, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
+                    radius, 0, 1);
+        }
+        return enemyMissile;
     }
 
     public void newWave() {
