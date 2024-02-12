@@ -142,7 +142,6 @@ public class WaveManager {
      */
     public void newWave() {
         this.wave++;
-//        this.meteorsPerWave = fib(wave);
         this.meteoriteVelocity = wave;
         this.meteorsPerWave = wave;
         this.meteorsSpawned = 0;

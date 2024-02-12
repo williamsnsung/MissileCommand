@@ -138,10 +138,7 @@ public class MissileCommand extends PApplet{
 
     public void settings() {
         size(SCREEN_WIDTH, SCREEN_HEIGHT) ;
-        //Create a gravitational force
         Gravity gravity = new Gravity(new PVector(0f, .1f)) ;
-        //Create a drag force
-        //Create the ForceRegistry
         forceRegistry = new ForceRegistry() ;
         ballistas = new Ballista[]{
                 new Ballista((float)(SCREEN_WIDTH * 0.1), (float)(SCREEN_HEIGHT * 0.9), 0, 0, 0, 5, BALLISTA_RADII),
