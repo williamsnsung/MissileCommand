@@ -132,6 +132,7 @@ public class MissileCommand extends PApplet{
             else {
                 enemies.remove(missile.getId());
             }
+            forceRegistry.remove(missile);
         }
     }
 
@@ -344,6 +345,7 @@ public class MissileCommand extends PApplet{
                     activeMissiles.remove(missile.getId());
                 }
                 exploding.put(missile.getId(), missile);
+                forceRegistry.remove(missile);
             }
 
             // if the list of exploding missiles is not empty, keep exploding them
