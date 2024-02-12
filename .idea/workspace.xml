@@ -9,9 +9,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a06ee47c-f8e3-433d-986a-1c40ea6e7acb" name="Changes" comment="Bombers seem to be working and spawning enemies correctly.">
+    <list default="true" id="a06ee47c-f8e3-433d-986a-1c40ea6e7acb" name="Changes" comment="Smart Bombs implemented, lots of magic numbers that need fixed though.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/MissileCommand/MissileCommand.iml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/MissileCommand/MissileCommand.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/EnemyMissile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/EnemyMissile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Missile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Missile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MissileCommand.iml" beforeDir="false" afterPath="$PROJECT_DIR$/src/MissileCommand.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MissileCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MissileCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WaveManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WaveManager.java" afterDir="false" />
     </list>
@@ -73,7 +76,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "onboarding.tips.debug.path": "/Users/williamsung/Documents/University/CS4303 - Video Games/Practical 1 - Missile Command/MissileCommand/src/src/Main.java",
-    "project.structure.last.edited": "Artifacts",
+    "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "vue.rearranger.settings.migration": "true"
@@ -101,6 +104,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
+        <option value="jdk-17.0.10-corretto-17.0.10-4caba194b151-53826d6a" />
         <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176" />
       </set>
     </attachedChunks>
@@ -261,7 +265,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707743849634</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Smart Bombs implemented, lots of magic numbers that need fixed though.">
+      <option name="closed" value="true" />
+      <created>1707749946272</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1707749946273</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -286,7 +298,8 @@
     <MESSAGE value="Missiles successfully splitting!" />
     <MESSAGE value="Fixed a concurrent modification bug on split missiles by returning missiles in spawnMissiles" />
     <MESSAGE value="Bombers seem to be working and spawning enemies correctly." />
-    <option name="LAST_COMMIT_MESSAGE" value="Bombers seem to be working and spawning enemies correctly." />
+    <MESSAGE value="Smart Bombs implemented, lots of magic numbers that need fixed though." />
+    <option name="LAST_COMMIT_MESSAGE" value="Smart Bombs implemented, lots of magic numbers that need fixed though." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -17,7 +17,6 @@ public class WaveManager {
     Gravity gravity;
     Drag drag;
     LinkedHashMap<Integer, EnemyMissile> enemies;
-    final int FIB_INIT = 2;
     int consumedPoints;
     boolean gameOver;
 
@@ -38,7 +37,7 @@ public class WaveManager {
         this.ballistas = ballistas;
         this.cities = cities;
         this.wave = 1;
-        this.meteorsPerWave = fib(wave);
+        this.meteorsPerWave = wave;
         this.meteorsSpawned = 0;
         this.enemiesAlive = 0;
         this.forceRegistry = forceRegistry;
@@ -52,37 +51,51 @@ public class WaveManager {
         this.SPLIT_PROBABILITY = SPLIT_PROBABILITY;
     }
 
-    // https://r-knott.surrey.ac.uk/Fibonacci/fibFormula.html [09/02/2024]
-    public int fib(int n) {
-        n += FIB_INIT;
-        double phi = 1.6180339887;
-        double sqrt5 = 2.2360679775;
-        double res = (Math.pow(phi, n) - Math.pow(-phi, -n))/sqrt5;
-        return (int) res;
-    }
-
+    /**
+     * Allocates a random velocity ±10% of the current meteorite velocity attribute
+     * @return the selected velocity
+     */
     public float newMissileVelocity() {
         return sketch.random(meteoriteVelocity * 0.9f, meteoriteVelocity * 1.1f);
     }
 
-    public EnemyMissile spawnMeteorite() {
+    /**
+     * Spawns a meteorite with a given radius, position, and probability
+     * Location of meteorite is selected randomly at the top of the screen
+     * @return
+     */
+    public EnemyMissile spawnEnemy() {
         float x = sketch.random(SCREEN_WIDTH);
         float y = (float) (SCREEN_HEIGHT * 0.1);
-        return spawnMeteorite(METEORITE_RADII, x, y, SPLIT_PROBABILITY, 0);
+        return spawnEnemy(METEORITE_RADII, x, y, SPLIT_PROBABILITY, 0);
     }
 
+    /**
+     * Spawns a smart bomb if it passes a probability check
+     * @param spawnProbability the spawn probability for a smart bomb
+     * @return
+     */
     public EnemyMissile spawnSmartBomb(float spawnProbability) {
         EnemyMissile enemyMissile = null;
         boolean drop = spawnProbability > sketch.random(1);
         if (drop) {
             float x = sketch.random(SCREEN_WIDTH);
             float y = (float) (SCREEN_HEIGHT * 0.1);
-            enemyMissile = spawnMeteorite(METEORITE_RADII, x, y, 0, 2);
+            enemyMissile = spawnEnemy(METEORITE_RADII, x, y, 0, 2);
         }
         return enemyMissile;
     }
 
-    public EnemyMissile spawnMeteorite(int radius, float x, float y, float splitProbability, int type) {
+    /**
+     * Spawns an enemy with specified parameters targeting a random piece of infrastructure
+     * @param radius radius of the spawned meteorite
+     * @param x the x location of the meteorite to spawn in
+     * @param y the x location of the meteorite to spawn in
+     * @param splitProbability the probability for this meteorite to split in two
+     * @param type what type of enemy to spawn
+     * @return the spawned enemy
+     */
+    public EnemyMissile spawnEnemy(int radius, float x, float y, float splitProbability, int type) {
         PVector pos = new PVector(x, y);
         PVector velocity;
         int target = (int) sketch.random(ballistas.length + cities.length);
@@ -102,12 +115,20 @@ public class WaveManager {
                 radius, splitProbability, type);
     }
 
-    public EnemyMissile spawnBomber(int radius, float spawnProbability) {
+    /**
+     * Spawns a bomber
+     * @param radius radius of the bomber
+     * @param spawnProbability the probability that the bomber should spawn
+     * @param maxHeight the max possible height the bomber could spawn at
+     * @param minHeight the minimum possible height the bomber could spawn at
+     * @return the spawned bomber or null
+     */
+    public EnemyMissile spawnBomber(int radius, float spawnProbability, float minHeight, float maxHeight) {
         EnemyMissile enemyMissile = null;
         boolean spawn = spawnProbability > sketch.random(1);
         if (spawn) {
             float x = 0;
-            float y = sketch.random((float) (SCREEN_HEIGHT * 0.2), (float) SCREEN_HEIGHT / 3);
+            float y = sketch.random(minHeight, maxHeight);
 
             enemyMissile = new EnemyMissile(x, y, 3, 0,
                     INVERTED_METEORITE_MASS, 100, METEORITE_EXPLOSION_RADIUS, METEORITE_EXPLOSION_STATES,
@@ -116,6 +137,9 @@ public class WaveManager {
         return enemyMissile;
     }
 
+    /**
+     * Starts a new wave
+     */
     public void newWave() {
         this.wave++;
 //        this.meteorsPerWave = fib(wave);
@@ -168,6 +192,9 @@ public class WaveManager {
         return this.enemiesAlive;
     }
 
+    /**
+     * Decrements the enemiesAlive parameter
+     */
     public void enemyKilled() {
         this.enemiesAlive--;
     }
@@ -179,10 +206,18 @@ public class WaveManager {
         sketch.text("SCORE: " + this.score, 5, 40);
     }
 
+    /**
+     * Adds to the score based on the score multiplier
+     * @param score the score to be added
+     */
     public void addScore(int score) {
         this.score += score * getScoreMultiplier();
     }
 
+    /**
+     * Gets the score multiplier for the current round
+     * @return the score multiplier for the current round
+     */
     private int getScoreMultiplier() {
         int scoreMultiplier = 1;
         switch (this.wave) {
@@ -211,6 +246,10 @@ public class WaveManager {
         return scoreMultiplier;
     }
 
+    /**
+     * Returns whether the game is over
+     * @return boolean based on if game is over, if it is, true
+     */
     public boolean isGameOver() {
         return this.gameOver;
     }

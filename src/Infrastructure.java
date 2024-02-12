@@ -26,6 +26,9 @@ public class Infrastructure extends GameObject{
         return this.score;
     }
 
+    /**
+     *
+     */
     public void die() {
         this.alive = false;
     }

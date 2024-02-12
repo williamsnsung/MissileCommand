@@ -32,8 +32,12 @@ public class MissileCommand extends PApplet{
     final float SPLIT_PROBABILITY = 0.01f;
     final float BOMBER_PROBABILITY = 0.001f;
     final float SMART_BOMB_DISPLACEMENT_FORCE = 5f;
+    final int SMART_BOMB_SEARCH_RADIUS = 100;
     final float BOMBER_DROP_PROBABILITY = 0.01f;
+    final float BOMBER_MIN_HEIGHT = SCREEN_HEIGHT * 0.1f;
+    final float BOMBER_MAX_HEIGHT = SCREEN_HEIGHT * 0.4f;
     final float SMART_BOMB_PROBABILITY = 0.001f;
+    final int METEORITE_SPLIT_RADIUS = 15;
     final Gravity gravity = new Gravity(new PVector(0, 0.1f));
     final Drag drag = new Drag(.01f, .01f);
     final int METEORITE_SCORE = 25;
@@ -52,6 +56,13 @@ public class MissileCommand extends PApplet{
     WaveManager waveManager;
 
 
+    /**
+     * Generic method that pops the first element from a LinkedHashMap
+     * @param hashMap The hashmap to remove the first element from
+     * @return Returns the value of the first element removed
+     * @param <K> Any type
+     * @param <V> Any type
+     */
     public <K, V> V popFirst(LinkedHashMap<K, V> hashMap){
         if (hashMap.isEmpty()) {
             return null;
@@ -63,6 +74,12 @@ public class MissileCommand extends PApplet{
         return res.getValue();
     }
 
+    /**
+     * Fires a missile in a straight line by making a vector from your mouse position and the position of the active
+     * ballista.
+     * @param mouseX mouses x position
+     * @param mouseY mouses y position
+     */
     public void fireMissile(float mouseX, float mouseY) {
         if (ballistas[activeBallista].getMissiles() == 0) {
             return;
@@ -81,6 +98,9 @@ public class MissileCommand extends PApplet{
         forceRegistry.add(missile, drag);
     }
 
+    /**
+     * Moves the active missiles into a triggered mode so that they can explode in sequence
+     */
     public void triggerMissiles() {
         for (Missile missile : activeMissiles.values()) {
             triggeredMissiles.put(missile.getId(), missile);
@@ -88,10 +108,20 @@ public class MissileCommand extends PApplet{
         activeMissiles = new LinkedHashMap<>();
     }
 
+    /**
+     * Checks if a missile is in the air or if it has collided with the ground
+     * @param missile the missile to check collisions for
+     * @return if the missile is in the air then true
+     */
     public boolean missileInAir(Missile missile) {
         return !(missile.position.y > (float) (SCREEN_HEIGHT * 0.9));
     }
 
+    /**
+     * Takes GameObjects that have been triggered by another explosion and adds them into the list of exploding
+     * objects
+     * @param toExplode LinkedList of game objects that are exploding
+     */
     public void integrateExplosions(LinkedList<Missile> toExplode) {
         while (!toExplode.isEmpty()) {
             Missile missile = toExplode.removeFirst();
@@ -145,32 +175,38 @@ public class MissileCommand extends PApplet{
 
         background(0);
         cursor(CROSS);
+        // If game is over show game over screen
         if (waveManager.isGameOver()) {
             PFont font = createFont("Arial",16,true);
             textFont(font,24);
             text("GAME OVER", 175, 250);
         }
         else {
+            // if no meteors remain and all meteors have been spawned then start a new wave
             if (waveManager.getMeteorsPerWave() <= waveManager.getMeteorsSpawned() && waveManager.getEnemiesAlive() <= 0) {
                 waveManager.newWave();
             }
             waveManager.draw();
 
+            // draws the ground
             rect(0, (float)(SCREEN_HEIGHT * 0.9), SCREEN_WIDTH, (float)(SCREEN_HEIGHT * 0.1));
+            // draws the ballistas
             for (int i = 0; i < ballistas.length; i++) {
                 ballistas[i].draw(this, i == activeBallista);
             }
-
+            // draws the cities
             for (Infrastructure city : cities) {
                 city.draw(this);
             }
-
+            // game objects that have reached their maximum explosion radius are considered exploded
+            // these will continue to explode until the explosion lag is expired
             for (Missile missile : exploded) {
                 LinkedList<Missile> toExplode = missile.explode(this, ballistas, cities, enemies, activeMissiles, triggeredMissiles, waveManager);
                 integrateExplosions(toExplode);
                 explosionLag++;
             }
 
+            // removes game objects in sequence from the exploded list
             if (!exploded.isEmpty() && explosionLag >= MAX_EXPLOSION_DURATION) {
                 if (exploded.getFirst() instanceof EnemyMissile) {
                     waveManager.enemyKilled();
@@ -179,20 +215,24 @@ public class MissileCommand extends PApplet{
                 explosionLag = 0;
             }
 
+            // If the spawn lag from the previous meteor is over then spawn a new meteor
             if (waveManager.getMeteorsSpawned() < waveManager.getMeteorsPerWave() && meteoriteLag > METEORITE_SPAWN_LAG) {
                 meteoriteLag = 0;
-                EnemyMissile enemyMissile = waveManager.spawnMeteorite();
+                EnemyMissile enemyMissile = waveManager.spawnEnemy();
                 enemies.put(enemyMissile.getId(), enemyMissile);
                 forceRegistry.add(enemyMissile, gravity);
                 forceRegistry.add(enemyMissile, drag);
             }
 
+            // adds the triggered missiles in sequence to explode after some lag
             if (!triggeredMissiles.isEmpty() && triggerLag >= TRIGGER_SEQUENCE_LAG) {
                 triggerLag = 0;
                 Missile activatedMissile = popFirst(triggeredMissiles);
                 exploding.put(activatedMissile.getId(), activatedMissile);
             }
 
+            // draws missiles in the air unless they are colliding with an object, from which it will add it to a list
+            // of colliding objects
             LinkedList<Missile> collidingMissiles = new LinkedList<>();
             for (Missile missile : activeMissiles.values()) {
                 if (missileInAir(missile)) {
@@ -209,6 +249,8 @@ public class MissileCommand extends PApplet{
             for (EnemyMissile enemyMissile : enemies.values()) {
                 boolean collision = false;
                 Missile collider = null;
+                // checks if the enemy missile is colliding with any friendly ones. If it is, then adds the missile as
+                // a collider and then adds the score of the current missile
                 for (Missile missile : activeMissiles.values()) {
                     collision = enemyMissile.collisionCheck(missile);
                     if (collision) {
@@ -218,6 +260,8 @@ public class MissileCommand extends PApplet{
                     }
                 }
 
+                // if missile is a bomber, then try dropping a bomb
+                // if the bomber gets off the screen, then remove it
                 if (enemyMissile.getType() == 1) {
                     EnemyMissile bomb = enemyMissile.dropBomb(this, waveManager, METEORITE_RADII, BOMBER_DROP_PROBABILITY);
                     if (bomb != null) {
@@ -226,20 +270,26 @@ public class MissileCommand extends PApplet{
                     if (enemyMissile.getPosition().x > SCREEN_WIDTH) {
                         offScreenEnemies.add(enemyMissile);
                     }
-                } else if (enemyMissile.getType() == 2) {
-                    enemyMissile.detectExplosions(exploding, SMART_BOMB_DISPLACEMENT_FORCE);
+                }
+                // if the enemy is a smart bomb, then check for explosions nearby and move if necessary
+                else if (enemyMissile.getType() == 2) {
+                    enemyMissile.detectExplosions(exploding, SMART_BOMB_DISPLACEMENT_FORCE, SMART_BOMB_SEARCH_RADIUS);
                 }
 
+                // if it isn't the first wave, then try splitting meteorites
                 if (waveManager.getWave() != 1) {
-                    EnemyMissile splitMissile = enemyMissile.split(this, waveManager);
+                    EnemyMissile splitMissile = enemyMissile.split(this, waveManager, METEORITE_SPLIT_RADIUS);
                     if (splitMissile != null ) {
                         newMissiles.add(splitMissile);
                     }
                 }
+                // if a missile is in the air and no collisions have occurred, then draw the enemy
                 if (missileInAir(enemyMissile) && !collision) {
                     enemyMissile.draw(this);
                     enemyMissile.integrate();
                 }
+                // otherwise, add the enemy to the colliding missiles list along with the missile it collided with if it
+                // is not null
                 else {
                     if (collider != null){
                         collidingMissiles.add(collider);
@@ -247,12 +297,14 @@ public class MissileCommand extends PApplet{
                     collidingMissiles.add(enemyMissile);
                 }
             }
+            // if it isn't the first wave, try spawning a bomber
             if (waveManager.getWave() != 1) {
-                EnemyMissile bomber = waveManager.spawnBomber(25, BOMBER_PROBABILITY);
+                EnemyMissile bomber = waveManager.spawnBomber(25, BOMBER_PROBABILITY,
+                        BOMBER_MIN_HEIGHT, BOMBER_MAX_HEIGHT);
                 if (bomber != null ) {
                     enemies.put(bomber.getId(), bomber);
                 }
-
+                // if the wave is above 5, then try spawning a smart bomb
                 if (waveManager.getWave() >= 6) {
                     EnemyMissile smartBomb = waveManager.spawnSmartBomb(SMART_BOMB_PROBABILITY);
                     if (smartBomb != null ) {
@@ -262,10 +314,11 @@ public class MissileCommand extends PApplet{
                     }
                 }
             }
+            // remove off screen enemies
             for (EnemyMissile offScreenEnemy : offScreenEnemies) {
                 enemies.remove(offScreenEnemy.getId());
             }
-
+            // if new meteorites have been created such as from the bomber or from splitting, then add them
             while (!newMissiles.isEmpty()) {
                 EnemyMissile enemyMissile = newMissiles.removeFirst();
                 enemies.put(enemyMissile.getId(), enemyMissile);
@@ -275,21 +328,27 @@ public class MissileCommand extends PApplet{
                 enemyMissile.integrate();
             }
 
+            // draw the triggered missiles
             for (Missile missile : triggeredMissiles.values()) {
                 missile.draw(this);
                 missile.integrate();
             }
 
-            for (Missile surfaceMissile : collidingMissiles) {
-                if (surfaceMissile instanceof EnemyMissile) {
-                    enemies.remove(surfaceMissile.getId());
+            // for each colliding missile, remove them from their respective lists and add them to the list of exploding
+            // missiles
+            for (Missile missile : collidingMissiles) {
+                if (missile instanceof EnemyMissile) {
+                    enemies.remove(missile.getId());
                 }
                 else {
-                    activeMissiles.remove(surfaceMissile.getId());
+                    activeMissiles.remove(missile.getId());
                 }
-                exploding.put(surfaceMissile.getId(), surfaceMissile);
+                exploding.put(missile.getId(), missile);
             }
 
+            // if the list of exploding missiles is not empty, keep exploding them
+            // if they reach their max radius, add them to the list of exploded missiles
+            // if other explosions were triggered by the current explosion, then integrate them into the game
             if (!exploding.isEmpty()) {
                 LinkedList<Missile> toExplode = new LinkedList<>();
 
