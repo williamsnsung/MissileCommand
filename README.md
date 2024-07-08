@@ -13,7 +13,7 @@ W                 - Selects middle ballista
 E                 - Selects right most ballista
 
 ## Gameplay
-- Game beings play immediately
+- Game begins play immediately
 - Ballistas are placed in the left, middle, and right of the lower screen and are seen as larger white circles
 - Cities are smaller white circles between the ballista, seen in two groups of three
 - Launch missiles to destroy enemies falling from the sky
